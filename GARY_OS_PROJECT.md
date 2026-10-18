@@ -1,18 +1,19 @@
 # Gary OS project record
 
-- Project ID: `MEDIA-TO-GAZE-SPATIAL-AUDIO`
-- Display name: `To Gaze theatrical spatial audio system`
+- Project ID: `MEDIA-THEATRE-SOUND-MANAGEMENT`
+- Alias / Sample Production: `MEDIA-TO-GAZE-SPATIAL-AUDIO` (*To Gaze: Saint Clare of Assisi*)
+- Display name: `Theatrical Sound Management & Spatial Audio Platform`
 - Domain: `MEDIA_THEATRE_TECH`
 - Lifecycle: `ACTIVE`
 - Release: `v30`
 - Public repository: `https://github.com/glfernandez/to-gaze-spatial-audio`
 - Canonical full archive: private Google Drive folder `My Drive/clarw_lighting`
-- Public source boundary: code, cue sheets, scripts, manifests, and documentation
+- Public source boundary: soundboard engine, spatial audio processor, cue sheets, scripts, manifests, and documentation
 - Private asset boundary: `SFX/`, scratch audio, raw recordings, downloaded media, and local environments
 
 ## Recovery contract
 
-Gary OS should resolve this project by its project ID or aliases `To Gaze`, `Saint Clare soundboard`, and `clarw_lighting`. A fresh machine recovers source with Git and restores private production audio from Google Drive by following `ASSET_RESTORE.md`.
+Gary OS resolves this project by its core identity `MEDIA-THEATRE-SOUND-MANAGEMENT` or show aliases `To Gaze`, `MEDIA-TO-GAZE-SPATIAL-AUDIO`, `theatre soundboard`, `stage sound management`, and `clarw_lighting`. A fresh machine recovers source with Git and restores private production audio from Google Drive by following `ASSET_RESTORE.md`.
 
 ## Operating entry points
 

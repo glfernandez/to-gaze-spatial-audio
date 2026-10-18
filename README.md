@@ -1,17 +1,20 @@
-# *To Gaze: Saint Clare of Assisi* — Theatrical Audio & Spatial Soundboard System
+# Theatrical Audio & Spatial Soundboard Console (Play Sound Management Platform)
 
-> **Production Name:** *To Gaze: Saint Clare of Assisi*  
+> **Application:** Theatrical Audio & Spatial Soundboard Console  
+> **Sample Production Included:** *To Gaze: Saint Clare of Assisi*  
 > **System Codename:** `TO-GAZE-SPATIAL-AUDIO-V1`  
 > **Current Version:** `v30` (LocalStorage Sequencer Engine `to_gaze_soundboard_sequencer_v30`)  
-> **Gary OS Project:** `MEDIA-TO-GAZE-SPATIAL-AUDIO`  
+> **Gary OS Project Identity:** `MEDIA-THEATRE-SOUND-MANAGEMENT` (Show ID: `MEDIA-TO-GAZE-SPATIAL-AUDIO`)  
 > **Workspace Directory:** `clarw_lighting` (private Google Drive archive)  
-> **Status:** Production-Ready & Rehearsal-Locked  
+> **Design Scope:** Modular sound management, cue automation, and 3D spatial audio for stage plays  
 
 ---
 
 ## 1. Executive Summary
 
-This repository contains the complete theatrical sound design, cue automation, and immersive 3D spatial playback system for the stage play ***To Gaze: Saint Clare of Assisi***. 
+This repository provides a modular, zero-dependency Web Audio soundboard, timeline cue automator, and immersive 3D acoustic spatial playback system engineered specifically for live theatre and stage play sound design.
+
+The included reference production is ***To Gaze: Saint Clare of Assisi***, demonstrating end-to-end multi-scene sound cues, continuous audio beds, vocal proximity filtering, and acoustic radar mapping. The underlying architecture and control interface are designed as a reusable production platform for any stage play or live performance.
 
 The primary operational dashboard is [`Rehearsal_Soundboard.html`](./Rehearsal_Soundboard.html), a zero-dependency, standalone Web Audio and HTML5 single-page application engineered to run entirely offline from a local browser (Chrome or Safari) without requiring web servers, node runtimes, or database backends.
 
@@ -19,7 +22,16 @@ The system handles both standard stage soundboard playback (independent cue trig
 
 ---
 
-## 2. Quick Start Guide
+## 2. Adapting for Other Stage Plays
+
+To deploy this platform for a new theatrical production or live show:
+1. **Define Scene & Cue Data:** Update `SCENES_DATA` in [`Rehearsal_Soundboard.html`](./Rehearsal_Soundboard.html) or export/import custom scene presets with your play's acts, scenes, and audio cue identifiers.
+2. **Acoustic Radar & Spatial Coordinates:** Map your sound coordinates (azimuth, elevation, distance) in [`spatial_audio_engine.js`](./spatial_audio_engine.js) to match your physical stage dimensions and speaker rig.
+3. **Asset Directory:** Place your 48 kHz stereo production WAV/MP3 files into `SFX/<SCENE_NAME>/` and run `python3 verify_assets.py` to confirm zero missing assets before curtain call.
+
+---
+
+## 3. Quick Start Guide
 
 ### Recovering the complete project
 
