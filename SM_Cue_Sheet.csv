@@ -1,0 +1,236 @@
+# RULE: Do not add sound simply because a moment feels empty. Empty space is often the designed cue.
+Beat ID,Cue IN Trigger,Standby / Operator Notes,Cue OUT Trigger,Transition / Next State
+P1.001,Pre-show state,"Stage Settings The ‘stage’ represents Clare’s cell in her monastery at San Damiano. It is split like a triangle into 3 sections around the font in the centre. For the sake of a unified language, let's call these the ‘three stations of her cell’. The first station ( facing the audience directly on all sides at the top of the font) is a small clothes rack and a simple chair. The second station ( down stage right) is a straw mat where she sleeps. The Third Station ( down stage left) is a little table with a chair) Clare plays and performs intermittently between the three stations. Francis, a primary character in the play, walks in between these stations as if a memory in her mind. He sits on the stage right of the sanctuary. But for the beginning of the show, father is seated in the pews. A two person choir sits stage left of the altar. Most of the action takes place below the sanctuary around the three stations of the cell.",-,-
+P1.002,On house clear,-,HOLD until next sequence,-
+P1.003,Follows SFX breath,-,HOLD until next sequence,-
+P1.004,On Media Clicks,-,HOLD until next sequence,-
+P1.005,Action: Clare awakes from her...,-,HOLD until next sequence,-
+P1.006,On Francis rising,-,HOLD until next sequence,-
+P1.007,On Francis reaching cross,STANDBY: All depts HARD CUT to absolute silence,Visual cue: End of text / Sharda physical stop,Acoustic vacuum
+P1.008,Auto-follow silence,Lighting Action: Lights wash to reveal Clare gazing at Francis.,-,-
+P2.001,Clare slowly gets off the...,-,-,-
+P2.002,"Clare walks to Francis, gazes...",-,-,-
+P2.003,Slowly all the noises start...,-,-,-
+P2.004,Francis bows and takes his...,-,-,-
+P2.005,Clare gazes at Christ. She...,-,-,-
+P2.006,Sound: Starts to build to...,-,HOLD until next sequence,-
+P2.007,Choir: Acappela Humming/Quiet Prayer....,-,-,-
+P2.008,"PATER NOSTER Pater Noster, qui...",-,-,-
+P2.009,Action: Clare comes out of...,-,-,-
+P3.001,When I came to know...,-,-,-
+P3.002,She smiles. So you have...,-,-,-
+P3.003,I was born a long...,-,-,-
+P3.004,I was born into a...,-,-,-
+P3.005,But for a girl like...,-,-,-
+P3.006,Media: Bring them to the...,-,HOLD until next sequence,-
+P3.007,Sound: Medieval time/tone music...,-,HOLD until next sequence,-
+P3.008,"Now, I know what you’re...",-,-,-
+P3.009,What more could a woman...,-,HOLD until next sequence,-
+P3.010,"You see, I was no...",-,HOLD until next sequence,-
+P3.011,You see my Padre—he had...,-,HOLD until next sequence,-
+P3.012,Media: Various male caricatures. As...,-,HOLD until next sequence,-
+P3.013,"No! A transaction, really. But...",-,-,-
+P3.014,She looks at the audience....,-,-,-
+P3.015,"She smiles, then lets it...",-,HOLD until next sequence,-
+P3.016,Sound enters...,-,HOLD until next sequence,-
+P4.001,"CLARE But I was loved,...",-,HOLD until next sequence,-
+P4.002,My madre saw the world...,-,HOLD until next sequence,-
+P4.003,Media : we see cities/landscapes...,-,HOLD until next sequence,-
+P4.004,Especially in the poor who...,-,-,-
+P4.005,Sound : Transition...,-,HOLD until next sequence,-
+P4.006,I knew something was missing...,-,HOLD until next sequence,-
+A1.001,ACT I — THE MEETING...,-,Execute Fade,To Silence
+A1.002,Media: > back in time...,-,HOLD until next sequence,-
+A1.003,Action: Francis rises from his...,-,HOLD until next sequence,-
+A1.004,Sound: Sound underlies Francis as...,-,-,-
+A1.005,Francis: “We have been called...,-,-,-
+A1.006,Choir: “We have been called...,-,HOLD until next sequence,-
+A1.007,CLARE: … Francis....,-,-,-
+A1.008,She watches him. She whispers...,-,-,-
+A1.009,She gives a little disbelieving...,-,-,-
+A1.010,Clare weaves in and out...,-,-,-
+A2.001,Francis: The treasure of blessed...,-,-,-
+A2.002,Choir: The treasure of blessed...,-,HOLD until next sequence,-
+A2.003,CLARE: I didn't see this...,-,HOLD until next sequence,-
+A2.004,Sound design: Heartbeat...,-,HOLD until next sequence,-
+A2.005,"CLARE: Over time, Francis's words...",-,-,-
+A2.006,Francis turns to see Clare....,-,-,-
+A2.007,ACTION: Francis and Clare circle...,-,-,-
+A2.008,Media: Possible night imagery/stars etc....,-,HOLD until next sequence,-
+A2.009,Heartbeat - heart/ children/ light/...,-,-,-
+A2.010,CLARE: ( STILL CIRCLING) Francis...,-,-,-
+A2.011,Those were some of the...,-,-,-
+A2.012,ACTION: They stop circling. Francis...,-,-,-
+A2.013,(silence)...,-,-,-
+A2.014,CLARE: (continues circling on her...,-,-,-
+A2.015,(She stops circling) I knew...,-,-,-
+A2.016,Sound Design: The streets fill...,-,HOLD until next sequence,-
+A2.017,Media: We see Palms on...,-,HOLD until next sequence,-
+A2.018,ACTION: Clare walks to the...,-,-,-
+A3.001,CLARE: (Holding a Palm in...,-,HOLD until next sequence,-
+A3.002,"It was Palm Sunday, 18th...",-,HOLD until next sequence,-
+A3.003,Placing all my trust in...,-,-,-
+A3.004,"ACTION: Lights go down, a...",-,-,-
+A3.005,CLARE: We left at midnight....,STANDBY: SFX Heavy impact. Synth disruption.,HOLD until next sequence,-
+A3.006,Media: POV Clare running down...,-,HOLD until next sequence,-
+A3.007,ACTION: The swinging of the...,STANDBY: Cut all pulse. 100% Acoustic reality.,Francis takes out scissors,Instant Silence
+A3.008,A male choir member hands...,-,-,-
+A3.009,Choir: Make me a channel...,-,HOLD until next sequence,-
+A4.001,"CLARE: “Once this is cut,...",-,-,-
+A4.002,Clare walks into her cell....,-,-,-
+B1.001,ACT 2 ACTION: Clare moves...,-,-,-
+B1.002,Media: Lightning sound Strike Sound:...,-,HOLD until next sequence,-
+B1.003,"Voice of CHRIST: “Francis, rebuild...",-,HOLD until next sequence,-
+B1.004,"ACTION: Francis gets up, profound...",-,-,-
+B1.005,CLARE: (Clare moves to where...,-,-,-
+B1.006,San Damiano. The abandoned church...,-,-,-
+B1.007,And so Francis obeyed and...,-,-,-
+B1.008,But for me... San Damiano...,-,-,-
+B1.009,Sound: cicadas...,-,HOLD until next sequence,-
+B1.010,ACTION: Clare walks slowly into...,-,HOLD until next sequence,-
+B1.011,Media: Garden/ night? Stars?...,-,HOLD until next sequence,-
+B2.001,CLARE: If you listen closely...,-,-,-
+B2.002,"For the next 40 years,...",-,-,-
+B2.003,She is quiet...,-,-,-
+B2.004,"I was home, here, God’s...",-,-,-
+B2.005,But life away from my...,-,HOLD until next sequence,-
+B2.006,My padre was furious at...,-,-,-
+B2.007,I had to learn to...,-,-,-
+B2.008,"I felt nervous, afraid and...",-,-,-
+B2.009,Media: sunrise (cosmic mode)...,-,HOLD until next sequence,-
+B3.001,"And then one day, as...",-,-,-
+B3.002,ACTION: Clare turns around and...,-,-,-
+B3.003,Song: Agnes comes on singing...,-,HOLD until next sequence,-
+B3.004,AGNES: Mea soror. (My sister)...,-,-,-
+B3.005,CLARE: Mea soror. (My sister)...,-,-,-
+B3.006,ACTION: Clare puts on the...,-,-,-
+B3.007,MUSIC: Song Interlude ‘Story of...,-,HOLD until next sequence,-
+C1.001,ACT 3 Scene 1 ACTION:...,-,HOLD until next sequence,-
+C1.002,Francis and her gaze at...,-,-,-
+C1.003,CLARE: Some of you may...,-,-,-
+C1.004,But it is Christ I...,-,-,-
+C1.005,"To know Christ, I had...",-,-,-
+C1.006,(she walks towards the font...,-,Execute Fade,To Silence
+C1.007,Media (a convergence of women)...,-,HOLD until next sequence,-
+C1.008,ACTION: Sister Agnes walks onto...,-,HOLD until next sequence,-
+C1.009,Agnes places the bowl into...,-,HOLD until next sequence,-
+C1.010,Clare gestures to Agnes and...,-,-,-
+C2.001,CLARE: And as time went...,-,-,-
+C2.002,CLARE: Our sisterhood was growing....,-,-,-
+C2.003,How could one be superior...,-,-,-
+C2.004,Movement: She dries Agnes’s foot...,-,-,-
+C2.005,"But over time, I accepted...",-,-,-
+C2.006,(Approaches an audience member) May...,-,-,-
+C2.007,CLARE: (she washes an audience...,-,-,-
+C2.008,She becomes more solemn....,-,-,-
+C2.009,Francis placed me at the...,-,-,-
+C2.010,She dries the audience members'...,-,-,-
+C2.011,"You see, for me, it...",-,-,-
+C2.012,Silence....,-,-,-
+C2.013,CLARE: Was that a good...,-,-,-
+C2.014,"Clare smiles, followed by silence....",-,-,-
+C2.015,SEAN makes a guest appearance....,-,HOLD until next sequence,-
+C3.001,"CLARE: Through it all, I...",-,HOLD until next sequence,-
+C3.002,Francis walks and sits in...,-,-,-
+C3.003,"In 1225, after all his...",-,-,-
+C3.004,He came to be with...,-,-,-
+C3.005,The song is sung and...,-,HOLD until next sequence,-
+C4.001,"And then one day, Francis...",-,Execute Fade,To Silence
+C4.002,Scene 3 Sound : The...,-,HOLD until next sequence,-
+C4.003,MOVEMENT PIECE: Francis slowly leaves...,-,-,-
+C4.004,Once Francis is completely off...,-,-,-
+C4.005,Scene 4 Clare walks to...,-,-,-
+C4.006,"CLARE: When Francis passed on,...",-,-,-
+C4.007,My comrade. My brother. My...,-,-,-
+C4.008,"For me, as far away...",-,-,-
+C4.009,"Beat. We are human, after...",-,-,-
+C4.010,She looks towards Christ. CLARE:...,-,HOLD until next sequence,-
+C4.011,Clare is deteriorating physically. She...,-,-,-
+C4.012,Light: A light shines bright...,Light: A light shines bright by her desk. She notices it.,-,-
+C4.013,(Clare gets up and experiences...,-,-,-
+C4.014,"But out of that grief,...",-,-,-
+C4.015,A princess who chose to...,-,-,-
+C4.016,Media: Show St Agnes of...,-,HOLD until next sequence,-
+C4.017,A princess (beat) Agnes of...,-,-,-
+C4.018,A light in the darkness....,-,-,-
+C4.019,(She moves to the reflection...,-,-,-
+C4.020,And if I was gazing...,-,-,-
+C4.021,Choir: Hymn Transitions into Act...,-,HOLD until next sequence,-
+C4.022,The media plays...,-,-,-
+D1.001,ACT 4 Scene 1 Movement:...,-,HOLD until next sequence,-
+D1.002,MEDIA OLDER CLARE (LETTER 1)...,-,-,-
+D1.003,Oh Agnes… If you love...,-,-,-
+D1.004,"So, my beloved sister, you...",-,-,-
+D2.001,SOUND: Sound of the soldiers...,-,HOLD until next sequence,-
+D2.002,(She hears the sounds of...,-,-,-
+D2.003,Media: On-coming soldiers / could...,-,HOLD until next sequence,-
+D2.004,Sound of Voices : “What...,-,HOLD until next sequence,-
+D2.005,“ I am afraid!We are...,-,-,-
+D2.006,ACTION: Clare is seen to...,-,-,-
+D2.007,"CLARE: Dear Lord, what shall...",-,-,-
+D2.008,She kneels down and prays...,-,-,-
+D2.009,"CLARE: Jesus, please protect your...",-,-,-
+D2.010,VOICE OF CHRIST AS A...,CRITICAL STANDBY: Siege chaos HARD CUT. Choir bare vocal.,On Child Christ Voice,Complete absence of pressure
+D2.011,Clare hears the voice and...,-,-,-
+D2.012,Media: There is another magical...,-,HOLD until next sequence,-
+D2.013,"ACTION: After a long beat,...",-,-,-
+D2.014,MEDIA : The image of...,-,-,-
+D2.015,The only sound left is...,-,-,-
+D2.016,Clare: Do not be afraid....,-,-,-
+D2.017,Scene 2 She is writing...,-,-,-
+D4.001,Multi Media OLDER CLARE (Letter...,-,HOLD until next sequence,-
+D4.002,She drops her pen and...,-,-,-
+D4.003,Choir: A Christmas Hymn is...,-,HOLD until next sequence,-
+D5.001,Scene 3 Clare’s sister Agnes...,-,HOLD until next sequence,-
+D5.002,"AGNES: Sister, please eat. If...",-,-,-
+D5.003,"CLARE: Sister, do not tell...",-,-,-
+D6.001,"AGNES: Sister, let me help...",-,-,-
+D6.002,Clare falls down each time...,-,-,-
+D6.003,"CLARE: My Agnes… my Agnes,...",-,-,-
+D6.004,AGNES: Looking concerned. It is...,-,-,-
+D6.005,OLDER CLARE: Good. Good. Thank...,-,-,-
+D6.006,"Oh, my … All my...",-,-,-
+D6.007,She laughs softly through her...,-,-,-
+D6.008,OLDER CLARE: My Lord. My...,-,-,-
+D6.009,A moment of silence....,-,-,-
+D6.010,Then—A holy light begins to...,-,HOLD until next sequence,-
+D6.011,Replicate a 13th century mass...,-,HOLD until next sequence,-
+D6.012,CLARE: Blessed be the Lord...,CRITICAL STANDBY: Mass expansion collapse. Instant cut to breathing.,Line: 'You did not leave me',Return to frail body / Dry
+D6.013,I heard them all. The...,-,-,-
+D6.014,She looks around her cell....,-,-,-
+D6.015,"Beat. Thank you, Lord. She...",-,-,-
+D6.016,"SOUND: Then, slowly, everything fades...",-,-,-
+D6.017,Hymn: Make me a channel...,-,-,-
+D6.018,Third Letter— PART TWO ACTION:...,-,-,-
+D7.001,OLDER CLARE (letter three): My...,-,-,-
+D7.002,Look upon Him. (she looks...,-,-,-
+D7.003,He whom the heavens cannot...,-,-,-
+D7.004,"If you suffer with him,...",-,-,-
+D7.005,"Your sister, Clare....",-,-,-
+D7.006,Choir: Make me a channel...,-,HOLD until next sequence,-
+D8.001,CLARE: We are coming close...,-,-,-
+D8.002,"You might wonder, ‘But why...",-,-,-
+D8.003,What is left in that...,-,-,-
+D8.004,"In that nothingness, there is...",-,-,-
+D8.005,(she looks up at Christ)...,-,-,-
+D8.006,"Remember how I said, I...",-,-,-
+D8.007,I wanted so much to...,-,-,-
+D8.008,To live simply by the...,-,-,-
+D8.009,I had to unwrite the...,-,HOLD until next sequence,-
+D8.010,.....And I knew I was...,-,-,-
+D8.011,Media: A repeat of the...,-,HOLD until next sequence,-
+D9.001,CLARE ( FOURTH LETTER) :...,-,-,-
+D9.002,Media & said by Clare:...,-,-,-
+D9.003,When the world becomes noisy...,-,-,-
+D9.004,( She walks to the...,-,-,-
+D9.005,"And remember Mary, who carried...",-,-,-
+D9.006,Our blessed Father Francis taught...,-,-,-
+D9.007,Our poverty is not punishment....,-,-,-
+D9.008,"Rejoice, each and all of...",-,-,-
+D9.009,Choir: Canticle of Creatures in...,-,HOLD until next sequence,-
+E1.001,EPILOGUE ACTION: Clare gazes at...,-,-,-
+E1.002,CLARE: I have spent my...,STANDBY: Final silence hold.,Line: 'Only to remain',-
+E1.003,Clare is looking up at...,-,-,-
+E1.004,11 AUGUST 1253 Clare of...,-,-,-
+E1.005,Two days earlier: Pope Innocent...,-,-,-
+E1.006,Clare looks at the audience....,CRITICAL STANDBY: Blackout. 5 SECOND HOLD. NO APPLAUSE.,Sharda gaze complete,Absolute darkness and silence

@@ -1,0 +1,36 @@
+.DS_Store
+__pycache__/
+*.pyc
+venv/
+hf_env/
+scratch/
+
+# Private production media is archived in Google Drive, not public GitHub.
+SFX/**
+!SFX/.gitkeep
+*.wav
+*.mp3
+*.m4a
+*.aif
+*.aiff
+*.flac
+*.mp4
+*.mov
+
+# Credentials and machine-local configuration.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+client_secret*.json
+service-account*.json
+token*.json
+
+# Generated or local state.
+*.log
+.idea/
+.vscode/

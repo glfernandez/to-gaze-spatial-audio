@@ -1,0 +1,5267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To Gaze - Visual Soundboard & Scene Sequencer (Dramaturgy Edition)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background-color: #121212;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    padding: 20px;
+    margin: 0;
+  }
+  
+  /* Top Master Bar */
+  .mbar {
+    position: sticky;
+    top: 0;
+    background: rgba(18, 18, 18, 0.98);
+    padding: 14px 0;
+    z-index: 100;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .mbar h1 {
+    color: #d4af37;
+    margin: 0;
+    font-size: 1.5em;
+  }
+  .mbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .stpall {
+    background: #c0392b;
+    color: #fff;
+    font-size: 0.9em;
+    padding: 9px 18px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .stpall:hover { background: #e74c3c; }
+  .btn-fade-all {
+    background: #8e44ad;
+    color: #fff;
+    font-size: 0.9em;
+    padding: 9px 18px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn-fade-all:hover { background: #9b59b6; }
+  .btn-aux {
+    background: #252525;
+    color: #bbb;
+    border: 1px solid #444;
+    padding: 7px 12px;
+    font-size: 0.8em;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn-aux:hover { background: #333; color: #fff; }
+
+  /* Scene Container & Header */
+  .sc {
+    margin-bottom: 45px;
+    background: #181818;
+    border: 1px solid #282828;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  }
+  .sc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+  .sc-title {
+    color: #d4af37;
+    margin: 0;
+    font-size: 1.3em;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .sc-deck {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .btn-sc-play {
+    background: #27ae60;
+    color: white;
+    padding: 7px 16px;
+    font-size: 0.85em;
+    border-radius: 4px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn-sc-play:hover { background: #2ecc71; }
+  .btn-sc-play.playing { background: #e67e22; }
+  .btn-sc-play.playing:hover { background: #f39c12; }
+  .btn-sc-reset {
+    background: #333;
+    color: #ddd;
+    padding: 7px 12px;
+    font-size: 0.85em;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-sc-reset:hover { background: #444; color: #fff; }
+  .sc-time {
+    font-family: monospace;
+    font-size: 0.95em;
+    color: #fff;
+    background: #111;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #333;
+  }
+  .sc-dur-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82em;
+    color: #bbb;
+  }
+  .sc-dur-input {
+    background: #222;
+    border: 1px solid #444;
+    color: #d4af37;
+    padding: 4px 6px;
+    border-radius: 4px;
+    width: 60px;
+    font-family: monospace;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  /* Scene Master Timeline / Multi-Lane Sequencer Bar */
+  .tl-container {
+    background: #0f0f0f;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tl-top-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.76em;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tl-ruler-wrap {
+    position: relative;
+    width: 100%;
+    height: 26px;
+    background: #1c1c1c;
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid #333;
+  }
+  .tl-ticks {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 4px 3px 4px;
+    box-sizing: border-box;
+    pointer-events: none;
+  }
+  .tl-tick-label {
+    font-size: 0.68em;
+    color: #666;
+    font-family: monospace;
+    user-select: none;
+  }
+  .tl-master-playhead {
+    position: absolute;
+    width: 3px;
+    height: 100%;
+    background: #e74c3c;
+    top: 0;
+    left: 0%;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 0 6px rgba(231, 76, 60, 0.8);
+    transition: left 0.04s linear;
+  }
+  .tl-cont-loop-zone {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: rgba(243, 156, 18, 0.14);
+    border-left: 2px dashed #f39c12;
+    border-right: 2px solid #f39c12;
+    pointer-events: none;
+    z-index: 5;
+    display: none;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 6px;
+    font-size: 0.65em;
+    color: #f39c12;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-sizing: border-box;
+  }
+  .tl-cont-seeker {
+    position: absolute;
+    top: -6px;
+    bottom: -4px;
+    width: 24px;
+    margin-left: -12px;
+    z-index: 25;
+    cursor: ew-resize;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    touch-action: none;
+    user-select: none;
+  }
+  .tl-cont-handle {
+    background: #f39c12;
+    color: #111;
+    font-size: 11px;
+    font-weight: 800;
+    width: 22px;
+    height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6), 0 0 8px rgba(243, 156, 18, 0.7);
+    border: 1px solid #fff;
+    pointer-events: all;
+    transition: transform 0.1s, background 0.1s;
+  }
+  .tl-cont-seeker:hover .tl-cont-handle, .tl-cont-seeker.dragging .tl-cont-handle {
+    transform: scale(1.18);
+    background: #ffc04d;
+  }
+  .tl-cont-line {
+    width: 2px;
+    flex: 1;
+    background: #f39c12;
+    pointer-events: none;
+    box-shadow: 0 0 4px rgba(243, 156, 18, 0.8);
+  }
+
+  /* Multi-Lane Visualizer */
+  .tl-lanes {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 4px;
+  }
+  .tl-lane {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 24px;
+  }
+  .tl-lane-name {
+    width: 130px;
+    font-size: 0.76em;
+    font-weight: 600;
+    color: #ccc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+  }
+  .tl-lane-track {
+    position: relative;
+    flex-grow: 1;
+    height: 18px;
+    background: #161616;
+    border-radius: 3px;
+    border: 1px solid #262626;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .tl-cue-block {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    border-radius: 3px;
+    background: rgba(212, 175, 55, 0.3);
+    border: 1px solid #d4af37;
+    display: flex;
+    align-items: center;
+    padding-left: 6px;
+    font-size: 0.68em;
+    color: #fff;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: background 0.15s, box-shadow 0.15s;
+    user-select: none;
+    cursor: ew-resize;
+    touch-action: none;
+  }
+  .tl-cue-block:hover {
+    filter: brightness(1.25);
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+  }
+  .tl-cue-block.dragging {
+    filter: brightness(1.4);
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.9);
+    z-index: 10;
+  }
+  .tl-cue-block.looping {
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(212, 175, 55, 0.25),
+      rgba(212, 175, 55, 0.25) 8px,
+      rgba(212, 175, 55, 0.45) 8px,
+      rgba(212, 175, 55, 0.45) 16px
+    );
+    border: 1px solid #f1c40f;
+  }
+  .tl-cue-block.active {
+    background: #d4af37 !important;
+    color: #111 !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
+  }
+  .tl-lane-playhead {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: #e74c3c;
+    top: 0;
+    left: 0%;
+    z-index: 5;
+    pointer-events: none;
+    transition: left 0.04s linear;
+  }
+
+  /* Grid & Sound Boxes */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 18px;
+  }
+  .box {
+    background: #1e1e1e;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .box.on {
+    border-color: #d4af37;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+    background: #2a2411;
+  }
+  .trow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .ttl {
+    font-size: 0.98em;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  /* Cue Scheduling Strip in Box */
+  .cue-strip {
+    background: #141414;
+    border: 1px solid #282828;
+    border-radius: 5px;
+    padding: 6px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78em;
+  }
+  .cue-time-input {
+    background: #222;
+    border: 1px solid #444;
+    color: #d4af37;
+    width: 48px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-weight: bold;
+    text-align: center;
+  }
+  .btn-pin-cue {
+    background: #333;
+    color: #ccc;
+    border: 1px solid #444;
+    border-radius: 3px;
+    padding: 3px 7px;
+    font-size: 0.75em;
+    cursor: pointer;
+  }
+  .btn-pin-cue:hover { background: #444; color: #fff; }
+  .cue-status-pill {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.72em;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: #252525;
+    color: #777;
+    border: 1px solid #3a3a3a;
+  }
+  .cue-status-pill.queued {
+    background: #2a2512;
+    color: #d4af37;
+    border-color: #8c7322;
+  }
+  .cue-status-pill.active {
+    background: #1b3820;
+    color: #2ecc71;
+    border-color: #27ae60;
+  }
+
+  /* Faders Row inside Box */
+  .fader-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    background: #141414;
+    border: 1px solid #282828;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-size: 0.75em;
+    color: #aaa;
+    flex-wrap: wrap;
+  }
+  .fader-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .fader-lbl {
+    font-size: 0.82em;
+    color: #888;
+    white-space: nowrap;
+  }
+  .fader-select {
+    background: #222;
+    color: #ccc;
+    border: 1px solid #444;
+    border-radius: 3px;
+    padding: 2px 4px;
+    font-size: 0.85em;
+    cursor: pointer;
+  }
+  .btn-box-fade {
+    background: #222;
+    border-radius: 3px;
+    padding: 3px 8px;
+    font-size: 0.75em;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .btn-box-fade-in {
+    background: #132415;
+    border: 1px solid #27ae60;
+    color: #2ecc71;
+  }
+  .btn-box-fade-in:hover {
+    background: #1e3d23;
+    color: #58d68d;
+    box-shadow: 0 0 6px rgba(46, 204, 113, 0.4);
+  }
+  .btn-box-fade-in.fading {
+    background: #27ae60 !important;
+    color: #fff !important;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.8);
+    animation: fadePulseGreen 0.7s infinite alternate;
+  }
+  .btn-box-fade-out {
+    background: #2b1313;
+    border: 1px solid #c0392b;
+    color: #e74c3c;
+  }
+  .btn-box-fade-out:hover {
+    background: #441c1c;
+    color: #ec7063;
+    box-shadow: 0 0 6px rgba(231, 76, 60, 0.4);
+  }
+  .btn-box-fade-out.fading {
+    background: #c0392b !important;
+    color: #fff !important;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.8);
+    animation: fadePulseRed 0.7s infinite alternate;
+  }
+  @keyframes fadePulseGreen {
+    from { opacity: 0.75; }
+    to { opacity: 1; box-shadow: 0 0 12px rgba(46, 204, 113, 1); }
+  }
+  @keyframes fadePulseRed {
+    from { opacity: 0.75; }
+    to { opacity: 1; box-shadow: 0 0 12px rgba(231, 76, 60, 1); }
+  }
+
+  /* Slow Crossfade Row (Specialized for SFX-38 Sacred Mass bed vocal transition) */
+  .slow-crossfade-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: linear-gradient(135deg, #1f142b, #120e1a);
+    border: 1px solid #8e44ad;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-top: 6px;
+    box-shadow: 0 2px 8px rgba(142, 68, 173, 0.25);
+  }
+  .btn-slow-crossfade {
+    flex: 1;
+    background: linear-gradient(135deg, #51227a, #331252);
+    border: 1px solid #a855f7;
+    color: #f3e8ff;
+    padding: 7px 12px;
+    border-radius: 4px;
+    font-size: 0.78em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+    user-select: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+  }
+  .btn-slow-crossfade:hover {
+    background: linear-gradient(135deg, #6c2eb0, #44176e);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+    border-color: #c084fc;
+  }
+  .btn-slow-crossfade.crossfading {
+    background: linear-gradient(135deg, #d35400, #962d00) !important;
+    border-color: #f39c12 !important;
+    color: #fff !important;
+    box-shadow: 0 0 14px rgba(243, 156, 18, 0.85) !important;
+    animation: crossfadePulse 0.8s infinite alternate;
+  }
+  @keyframes crossfadePulse {
+    from { opacity: 0.85; transform: scale(0.99); }
+    to { opacity: 1; transform: scale(1.01); box-shadow: 0 0 18px rgba(243, 156, 18, 1); }
+  }
+  .slow-fade-adj {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75em;
+    color: #bbb;
+    white-space: nowrap;
+    background: #0d0a14;
+    padding: 4px 7px;
+    border-radius: 4px;
+    border: 1px solid #43295c;
+  }
+  .slow-fade-lbl {
+    color: #c084fc;
+    font-weight: 600;
+    font-size: 0.82em;
+    letter-spacing: 0.3px;
+  }
+  .slow-fade-input {
+    width: 46px;
+    background: #1b1328;
+    border: 1px solid #8e44ad;
+    color: #f1c40f;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 3px;
+    padding: 2px 4px;
+    font-size: 0.95em;
+  }
+  .slow-fade-input:focus {
+    outline: none;
+    border-color: #f1c40f;
+    box-shadow: 0 0 6px rgba(241, 196, 15, 0.5);
+  }
+  .slow-fade-unit {
+    color: #888;
+    font-size: 0.82em;
+  }
+
+  /* Live Visual Fade-Off Meter & Indicators */
+  .slowfade-meter-wrap {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: #0f0b18;
+    border: 1px solid #7d3ca8;
+    border-radius: 5px;
+    padding: 7px 10px;
+    margin-top: 6px;
+    box-shadow: 0 0 10px rgba(125, 60, 168, 0.3);
+    animation: fadeInMeter 0.25s ease-out;
+  }
+  @keyframes fadeInMeter {
+    from { opacity: 0; transform: translateY(-3px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .slowfade-meter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72em;
+    font-weight: 700;
+  }
+  .slowfade-meter-title {
+    color: #e67e22;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .slowfade-meter-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e67e22;
+    display: inline-block;
+    animation: pulseDot 0.6s infinite alternate;
+  }
+  @keyframes pulseDot {
+    from { opacity: 0.3; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1.2); }
+  }
+  .slowfade-meter-readout {
+    color: #f1c40f;
+    font-family: monospace;
+    font-size: 1.05em;
+    font-weight: 700;
+  }
+  .slowfade-meter-track {
+    width: 100%;
+    height: 10px;
+    background: #191224;
+    border: 1px solid #4a296d;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+  }
+  .slowfade-meter-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #c0392b 0%, #d35400 35%, #9b59b6 75%, #a855f7 100%);
+    border-radius: 4px;
+    transition: width 0.08s linear;
+    position: relative;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+  }
+  .slowfade-meter-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+    animation: shimmerMeter 1.5s infinite linear;
+  }
+  @keyframes shimmerMeter {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  .slowfade-meter-sub {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.68em;
+    color: #a89bb5;
+    font-style: italic;
+  }
+  .box.slowfading {
+    border-color: #e67e22 !important;
+    box-shadow: 0 0 18px rgba(230, 126, 34, 0.45) !important;
+  }
+
+  .crow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  button.btn-play {
+    padding: 8px 14px;
+    cursor: pointer;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: 0.2s;
+    min-width: 75px;
+  }
+  button.btn-play:hover { background: #444; }
+  button.btn-play.on { background: #c0392b; }
+  button.btn-play.on:hover { background: #e74c3c; }
+
+  .scol {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 6px;
+  }
+  .srow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .slbl {
+    font-size: 0.75em;
+    color: #999;
+    width: 24px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  input[type=range] {
+    flex-grow: 1;
+    cursor: pointer;
+    height: 4px;
+    accent-color: #d4af37;
+  }
+  .spd { accent-color: #3498db; }
+  
+  .pan-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pan-slider {
+    flex-grow: 1;
+    cursor: pointer;
+    height: 4px;
+    accent-color: #27ae60;
+  }
+  .pan-val {
+    font-size: 0.73em;
+    color: #2ecc71;
+    font-weight: 600;
+    width: 52px;
+    text-align: right;
+    font-family: monospace;
+    cursor: pointer;
+  }
+  .pan-val:hover {
+    text-decoration: underline;
+  }
+
+  .sv {
+    font-size: 0.75em;
+    color: #aaa;
+    width: 38px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  select.osel {
+    background: #252525;
+    color: #ddd;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 0.78em;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .llbl {
+    font-size: 0.78em;
+    color: #bbb;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .fxsub-lbl {
+    font-size: 0.74em;
+    color: #f39c12;
+    background: rgba(243, 156, 18, 0.12);
+    border: 1px solid rgba(243, 156, 18, 0.45);
+    padding: 2px 7px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    user-select: none;
+    transition: all 0.2s ease;
+  }
+  .fxsub-lbl:hover {
+    background: rgba(243, 156, 18, 0.25);
+    border-color: #f39c12;
+    color: #fff;
+  }
+  .fxsub-lbl.active {
+    background: #f39c12;
+    color: #111;
+    border-color: #f1c40f;
+    box-shadow: 0 0 10px rgba(243, 156, 18, 0.55);
+  }
+  .fxsub-lbl input[type="checkbox"] {
+    accent-color: #f39c12;
+    margin: 0;
+    cursor: pointer;
+  }
+  .fxslow-lbl {
+    font-size: 0.74em;
+    color: #1abc9c;
+    background: rgba(26, 188, 156, 0.12);
+    border: 1px solid rgba(26, 188, 156, 0.45);
+    padding: 2px 7px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    user-select: none;
+    transition: all 0.2s ease;
+  }
+  .fxslow-lbl:hover {
+    background: rgba(26, 188, 156, 0.25);
+    border-color: #1abc9c;
+    color: #fff;
+  }
+  .fxslow-lbl.active {
+    background: #1abc9c;
+    color: #111;
+    border-color: #16a085;
+    box-shadow: 0 0 10px rgba(26, 188, 156, 0.55);
+  }
+  .fxslow-lbl input[type="checkbox"] {
+    accent-color: #1abc9c;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  /* Trimmer */
+  .tbox {
+    background: #111;
+    padding: 12px 10px 8px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .tarea {
+    position: relative;
+    width: 100%;
+    height: 24px;
+  }
+  .ttrk {
+    position: absolute;
+    width: 100%;
+    height: 8px;
+    background: #333;
+    top: 8px;
+    border-radius: 4px;
+  }
+  .tfil {
+    position: absolute;
+    height: 8px;
+    background: rgba(212, 175, 55, 0.45);
+    border: 1px solid #d4af37;
+    top: 7px;
+    border-radius: 4px;
+    z-index: 1;
+  }
+  .thead {
+    position: absolute;
+    width: 2px;
+    height: 24px;
+    background: #e74c3c;
+    top: 0;
+    z-index: 3;
+    left: 0%;
+    transition: left 0.05s linear;
+  }
+  input.tsl {
+    position: absolute;
+    width: 100%;
+    height: 8px;
+    top: 8px;
+    margin: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    pointer-events: none;
+    z-index: 4;
+  }
+  input.tsl::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px;
+    height: 22px;
+    background: #d4af37;
+    border-radius: 3px;
+    cursor: ew-resize;
+    pointer-events: auto;
+    border: 1px solid #000;
+  }
+  input.tsl::-moz-range-thumb {
+    width: 13px;
+    height: 22px;
+    background: #d4af37;
+    border-radius: 3px;
+    cursor: ew-resize;
+    pointer-events: auto;
+    border: 1px solid #000;
+  }
+  .tlab {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72em;
+    color: #777;
+    margin-top: 2px;
+  }
+  .tcur {
+    color: #eee;
+    font-weight: bold;
+  }
+
+  #preset-file-input { display: none; }
+
+  
+  /* IMMERSIVE SPATIAL AUDIO STYLES (TO-GAZE-SPATIAL-AUDIO-V1) */
+  .immersive-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    background: #16181d;
+    border: 1px solid #28303d;
+    border-radius: 6px;
+    padding: 7px 12px;
+    margin-top: 8px;
+    font-size: 0.8em;
+    flex-wrap: wrap;
+  }
+  .spat-left-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn-immersive-toggle {
+    background: #1b263b;
+    color: #4cc9f0;
+    border: 1px solid #3a506b;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.85em;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .btn-immersive-toggle:hover {
+    background: #24344d;
+    color: #70e000;
+    border-color: #4cc9f0;
+  }
+  .badge-prof {
+    background: rgba(76, 201, 240, 0.15);
+    color: #4cc9f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.78em;
+    font-family: monospace;
+    font-weight: 600;
+  }
+  .lbl-fallback {
+    color: #e0a96d;
+    font-size: 0.78em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .spat-fader-grp {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.76em;
+    color: #8892b0;
+  }
+  .spat-fader {
+    width: 65px;
+    height: 3px;
+    cursor: pointer;
+    accent-color: #4cc9f0;
+  }
+  .spat-val {
+    font-family: monospace;
+    color: #ccd6f6;
+    min-width: 32px;
+  }
+  .spat-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-spat-aux {
+    background: #20242c;
+    color: #ccd6f6;
+    border: 1px solid #3a4250;
+    border-radius: 4px;
+    padding: 5px 9px;
+    font-size: 0.78em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-spat-aux:hover {
+    background: #2b323e;
+    color: #fff;
+    border-color: #5b667a;
+  }
+  .btn-spat-panel-toggle {
+    background: #20242c;
+    border-color: #3a506b;
+    color: #d4af37;
+  }
+  .btn-spat-panel-toggle:hover {
+    background: #2a2512;
+    border-color: #d4af37;
+    color: #ffd700;
+  }
+
+  /* Expandable Spatial Radar & Siege Deck Panel */
+  .immersive-panel {
+    background: #11141a;
+    border: 1px solid #28303d;
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 260px 1fr 280px;
+    gap: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  }
+  @media (max-width: 1050px) {
+    .immersive-panel { grid-template-columns: 1fr; }
+  }
+  .spat-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .spat-col-title {
+    color: #d4af37;
+    font-size: 0.85em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #232b36;
+    padding-bottom: 5px;
+    margin: 0;
+  }
+  .spat-select {
+    background: #1b2028;
+    color: #ccd6f6;
+    border: 1px solid #3a4454;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 0.82em;
+    width: 100%;
+    cursor: pointer;
+  }
+  .spat-speaker-list {
+    background: #0d0f13;
+    border: 1px solid #1f2530;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 0.72em;
+    color: #8892b0;
+    max-height: 140px;
+    overflow-y: auto;
+    font-family: monospace;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .spat-speaker-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 4px;
+    border-radius: 2px;
+  }
+  .spat-speaker-item.testing {
+    background: #2ecc71;
+    color: #111;
+    font-weight: bold;
+  }
+  .radar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #0b0d10;
+    border: 1px solid #202631;
+    border-radius: 6px;
+    padding: 8px;
+  }
+  .radar-canvas {
+    width: 100%;
+    max-width: 380px;
+    height: 240px;
+    background: #0f1115;
+    border-radius: 4px;
+  }
+  .radar-legend {
+    display: flex;
+    gap: 12px;
+    font-size: 0.7em;
+    color: #8892b0;
+    margin-top: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .radar-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .dot-legend {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-front { background: #3498db; }
+  .dot-surr { background: #2ecc71; }
+  .dot-sub { background: #e67e22; }
+  .dot-height { background: #9b59b6; }
+  .dot-source { background: #e74c3c; }
+
+  /* Siege 5-State Automation Sequencer Buttons */
+  .siege-states-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .btn-siege-state {
+    background: #181d24;
+    color: #a0aec0;
+    border: 1px solid #2d3748;
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-size: 0.74em;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .btn-siege-state:hover {
+    background: #232b36;
+    color: #fff;
+    border-color: #4a5568;
+  }
+  .btn-siege-state.active {
+    background: #2b1d1d;
+    color: #ff6b6b;
+    border-color: #e74c3c;
+    box-shadow: 0 0 8px rgba(231, 76, 60, 0.4);
+    font-weight: bold;
+  }
+  .safety-deck {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .btn-safety-blackout {
+    flex: 1;
+    background: #3b1818;
+    color: #ff8787;
+    border: 1px solid #c0392b;
+    border-radius: 4px;
+    padding: 6px;
+    font-size: 0.75em;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+  }
+  .btn-safety-blackout:hover {
+    background: #501e1e;
+    color: #fff;
+  }
+
+  /* Sound Card Spatial Location Tag */
+  .spat-tag {
+    font-size: 0.69em;
+    color: #4cc9f0;
+    background: rgba(76, 201, 240, 0.08);
+    border: 1px solid rgba(76, 201, 240, 0.25);
+    border-radius: 3px;
+    padding: 2px 6px;
+    margin-top: 4px;
+    font-family: monospace;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Sticky Header Wrapper & 9 Script-Aligned Tabs */
+  .sticky-top-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(18, 18, 18, 0.98);
+    backdrop-filter: blur(8px);
+    border-bottom: 2px solid #282828;
+    margin: -20px -20px 25px -20px;
+    padding: 16px 20px 10px 20px;
+  }
+  .scene-tab-bar {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 10px 0 2px 0;
+    scrollbar-width: thin;
+    align-items: center;
+  }
+  .scene-tab-btn {
+    background: #1e1e1e;
+    color: #aaa;
+    border: 1px solid #383838;
+    border-radius: 5px;
+    padding: 7px 12px;
+    font-size: 0.78em;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .scene-tab-btn:hover {
+    background: #282828;
+    color: #fff;
+    border-color: #555;
+  }
+  .scene-tab-btn.active {
+    background: #2a2512;
+    color: #d4af37;
+    border-color: #d4af37;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+  }
+  .scene-tab-btn .tab-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #444;
+    display: inline-block;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+  .scene-tab-btn.active .tab-dot {
+    background: #d4af37;
+  }
+  .scene-tab-btn.playing .tab-dot {
+    background: #2ecc71 !important;
+    box-shadow: 0 0 7px #2ecc71;
+    animation: tabPulseGreen 0.7s infinite alternate;
+  }
+  @keyframes tabPulseGreen {
+    from { transform: scale(0.9); opacity: 0.7; }
+    to { transform: scale(1.3); opacity: 1; }
+  }
+  .scene-tab-btn-all {
+    background: #162018;
+    color: #81c784;
+    border-color: #2e5935;
+    margin-left: auto;
+  }
+  .scene-tab-btn-all:hover {
+    background: #1e2c20;
+    color: #a5d6a7;
+    border-color: #388e3c;
+  }
+  .scene-tab-btn-all.active {
+    background: #1b3820;
+    color: #4ade80;
+    border-color: #22c55e;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.35);
+  }
+
+</style>
+</head>
+<body>
+
+<header class="sticky-top-header">
+  <div class="mbar">
+    <h1>To Gaze &mdash; Visual Soundboard &amp; Scene Sequencer <span style="font-size:0.6em;color:#aaa;font-weight:normal;">[Dramaturgy Edition]</span></h1>
+    <div class="mbar-actions">
+      <button class="stpall" id="stopbtn">STOP ALL AUDIO</button>
+      <button class="btn-fade-all" id="fadeallbtn">FADE OUT ALL</button>
+      <button class="btn-aux" id="btn-export-preset">💾 Save Preset</button>
+      <button class="btn-aux" id="btn-import-preset">📂 Load Preset</button>
+      <button class="btn-aux" id="btn-reset-defaults" style="color:#e74c3c;">🔄 Reset</button>
+      <input type="file" id="preset-file-input" accept=".json">
+    </div>
+  </div>
+  <div class="scene-tab-bar" id="scene-tab-bar"></div>
+
+  <!-- IMMERSIVE SPATIAL AUDIO DECK (TO-GAZE-SPATIAL-AUDIO-V1) -->
+  <div class="immersive-strip" id="immersive-strip">
+    <div class="spat-left-controls">
+      <button class="btn-immersive-toggle" id="btn-immersive-toggle" title="Church Spatial Audio Engine is Active">
+        🎧 IMMERSIVE SPATIAL AUDIO <span class="badge-prof" id="badge-current-profile">PROFILE A (2.0 STEREO 3D)</span>
+      </button>
+      <label class="lbl-fallback" title="Force discrete stereo fallback without spatial matrix"><input type="checkbox" id="chk-stereo-fallback"> Stereo Fallback</label>
+      <span class="spat-fader-grp">
+        <span class="spat-fader-lbl">Surround:</span>
+        <input type="range" class="spat-fader" id="fader-surround" min="0" max="1.5" step="0.05" value="1.0">
+        <span class="spat-val" id="val-surround">100%</span>
+      </span>
+      <span class="spat-fader-grp">
+        <span class="spat-fader-lbl">Sub/LFE:</span>
+        <input type="range" class="spat-fader" id="fader-lfe" min="0" max="1.5" step="0.05" value="1.0">
+        <span class="spat-val" id="val-lfe">100%</span>
+      </span>
+    </div>
+    <div class="spat-right-actions">
+      <button class="btn-spat-aux" id="btn-test-speakers">🔊 Test Speakers</button>
+      <button class="btn-spat-aux btn-spat-panel-toggle" id="btn-toggle-spat-panel">📐 Spatial Radar &amp; Siege States ▼</button>
+    </div>
+  </div>
+
+  <div class="immersive-panel" id="immersive-panel" style="display:none;">
+    <!-- Column 1: Speaker Layout & Hardware Routing -->
+    <div class="spat-col">
+      <h3 class="spat-col-title">Speaker Layout &amp; Routing</h3>
+      <select class="spat-select" id="select-speaker-profile">
+        <option value="A">Profile A — Stereo / Binaural 3D (2 Ch)</option>
+        <option value="B">Profile B — Quad Surround (4 Ch: Church 4-Corner)</option>
+        <option value="C">Profile C — 5.1 Theatrical (6 Ch: L/C/R, LFE, Surrounds)</option>
+        <option value="D">Profile D — 7.1 Immersive (8 Ch: Full Perimeter)</option>
+        <option value="E">Profile E — Church Height (8+ Ch: Sanctuary Dome)</option>
+      </select>
+      <div class="spat-speaker-list" id="spat-speaker-list">
+        <div class="spat-speaker-item"><span>Ch 1: Front Left (FL)</span><span>45° L</span></div>
+        <div class="spat-speaker-item"><span>Ch 2: Front Right (FR)</span><span>45° R</span></div>
+      </div>
+      <button class="btn-spat-aux" id="btn-test-speakers-modal" style="width:100%;margin-top:auto;">🔊 Cycle Speaker Chimes</button>
+    </div>
+
+    <!-- Column 2: 2D Church Acoustic Radar Visualizer -->
+    <div class="spat-col radar-wrap">
+      <h3 class="spat-col-title" style="width:100%;text-align:center;">Church Sanctuary Acoustic Radar</h3>
+      <canvas class="radar-canvas" id="church-radar-canvas" width="380" height="240"></canvas>
+      <div class="radar-legend">
+        <span><span class="dot-legend dot-front"></span> Front/Center</span>
+        <span><span class="dot-legend dot-surr"></span> Surrounds</span>
+        <span><span class="dot-legend dot-height"></span> Dome Heights</span>
+        <span><span class="dot-legend dot-sub"></span> Sub/LFE</span>
+        <span><span class="dot-legend dot-source"></span> Live SFX</span>
+      </div>
+    </div>
+
+    <!-- Column 3: Act III Siege 5-State Sequencer & Safety -->
+    <div class="spat-col">
+      <h3 class="spat-col-title">Siege 5-State Spatial Sequencer</h3>
+      <div class="siege-states-grid">
+        <button class="btn-siege-state" id="btn-siege-s1" onclick="SpatialEngine.triggerSiegeState(1)">
+          <span>1. Approaching Army</span><span style="font-family:monospace;font-size:0.85em;">75m Rear</span>
+        </button>
+        <button class="btn-siege-state" id="btn-siege-s2" onclick="SpatialEngine.triggerSiegeState(2)">
+          <span>2. Convent Under Attack</span><span style="font-family:monospace;font-size:0.85em;">Walls/Gates</span>
+        </button>
+        <button class="btn-siege-state" id="btn-siege-s3" onclick="SpatialEngine.triggerSiegeState(3)">
+          <span>3. Clare's Fear (Auditory Tunnel)</span><span style="font-family:monospace;font-size:0.85em;">Heart Sub</span>
+        </button>
+        <button class="btn-siege-state" id="btn-siege-s4" onclick="SpatialEngine.triggerSiegeState(4)">
+          <span>4. Divine Intervention</span><span style="font-family:monospace;font-size:0.85em;">Child Ctr</span>
+        </button>
+        <button class="btn-siege-state" id="btn-siege-s5" onclick="SpatialEngine.triggerSiegeState(5)">
+          <span>5. Soldiers Retreat</span><span style="font-family:monospace;font-size:0.85em;">95m Peace</span>
+        </button>
+      </div>
+
+      <div style="margin-top:auto;">
+        <h4 style="font-size:0.75em;color:#ff8787;margin:6px 0 3px 0;text-transform:uppercase;">Emergency Safety Deck</h4>
+        <div class="safety-deck">
+          <button class="btn-safety-blackout" id="btn-spat-blackout-fade">🛑 Fade to Silence (2s)</button>
+          <button class="btn-safety-blackout" id="btn-spat-hard-stop" style="background:#4a1212;border-color:#e74c3c;">⚡ All Stop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div id="app"></div>
+
+<script>
+/**
+ * TO-GAZE-SPATIAL-AUDIO-V1
+ * Church-Scale Immersive Theatrical Audio Playback & Spatialization Engine
+ * Production: To Gaze: Saint Clare of Assisi
+ * Author: Antigravity Audio Engineering
+ */
+
+(function(global){
+  'use strict';
+
+  // 1. Speaker Layout Profiles Definition
+  var SPEAKER_PROFILES = {
+    'A': {
+      id: 'A',
+      name: 'Profile A — Stereo / Binaural 3D',
+      channels: 2,
+      description: 'Front Left & Right (2 Ch). Virtual 3D HRTF spatialization active for headphones & stereo PA.',
+      speakers: [
+        { id: 'FL', name: 'Front Left', ch: 0, x: -1.0, y: 1.0, z: 0.0, az: 315, el: 0 },
+        { id: 'FR', name: 'Front Right', ch: 1, x: 1.0, y: 1.0, z: 0.0, az: 45, el: 0 }
+      ]
+    },
+    'B': {
+      id: 'B',
+      name: 'Profile B — Quad Surround',
+      channels: 4,
+      description: '4-Corner Church Perimeter (FL, FR, Rear Left, Rear Right).',
+      speakers: [
+        { id: 'FL', name: 'Front Left', ch: 0, x: -1.0, y: 1.0, z: 0.0, az: 315, el: 0 },
+        { id: 'FR', name: 'Front Right', ch: 1, x: 1.0, y: 1.0, z: 0.0, az: 45, el: 0 },
+        { id: 'RL', name: 'Rear Left (Nave)', ch: 2, x: -1.0, y: -1.0, z: 0.0, az: 225, el: 0 },
+        { id: 'RR', name: 'Rear Right (Nave)', ch: 3, x: 1.0, y: -1.0, z: 0.0, az: 135, el: 0 }
+      ]
+    },
+    'C': {
+      id: 'C',
+      name: 'Profile C — 5.1 Theatrical Surround',
+      channels: 6,
+      description: 'Front L/C/R, LFE Subwoofer, and Side Surrounds (L-Shaped Seating aligned).',
+      speakers: [
+        { id: 'FL', name: 'Front Left', ch: 0, x: -0.85, y: 1.0, z: 0.0, az: 330, el: 0 },
+        { id: 'FR', name: 'Front Right', ch: 1, x: 0.85, y: 1.0, z: 0.0, az: 30, el: 0 },
+        { id: 'C',  name: 'Center (Proscenium)', ch: 2, x: 0.0, y: 1.0, z: 0.0, az: 0, el: 0 },
+        { id: 'LFE',name: 'Subwoofer (LFE)', ch: 3, x: 0.0, y: 0.0, z: -1.0, isLFE: true },
+        { id: 'SL', name: 'Surround Left (L-Arm)', ch: 4, x: -1.0, y: -0.3, z: 0.0, az: 250, el: 0 },
+        { id: 'SR', name: 'Surround Right (Nave Wall)', ch: 5, x: 1.0, y: -0.3, z: 0.0, az: 110, el: 0 }
+      ]
+    },
+    'D': {
+      id: 'D',
+      name: 'Profile D — 7.1 Immersive Theater',
+      channels: 8,
+      description: 'Front L/C/R, LFE, Side Surrounds, and Rear Surrounds.',
+      speakers: [
+        { id: 'FL', name: 'Front Left', ch: 0, x: -0.85, y: 1.0, z: 0.0, az: 330, el: 0 },
+        { id: 'FR', name: 'Front Right', ch: 1, x: 0.85, y: 1.0, z: 0.0, az: 30, el: 0 },
+        { id: 'C',  name: 'Center', ch: 2, x: 0.0, y: 1.0, z: 0.0, az: 0, el: 0 },
+        { id: 'LFE',name: 'Subwoofer (LFE)', ch: 3, x: 0.0, y: 0.0, z: -1.0, isLFE: true },
+        { id: 'SL', name: 'Side Left', ch: 4, x: -1.0, y: 0.0, z: 0.0, az: 270, el: 0 },
+        { id: 'SR', name: 'Side Right', ch: 5, x: 1.0, y: 0.0, z: 0.0, az: 90, el: 0 },
+        { id: 'RL', name: 'Rear Left', ch: 6, x: -0.85, y: -1.0, z: 0.0, az: 210, el: 0 },
+        { id: 'RR', name: 'Rear Right', ch: 7, x: 0.85, y: -1.0, z: 0.0, az: 150, el: 0 }
+      ]
+    },
+    'E': {
+      id: 'E',
+      name: 'Profile E — Church Height System (Sanctuary Dome)',
+      channels: 8,
+      description: 'Front L/C/R, Surrounds, and Overhead Dome Height Speakers.',
+      speakers: [
+        { id: 'FL', name: 'Front Left', ch: 0, x: -0.85, y: 1.0, z: 0.0, az: 330, el: 0 },
+        { id: 'FR', name: 'Front Right', ch: 1, x: 0.85, y: 1.0, z: 0.0, az: 30, el: 0 },
+        { id: 'C',  name: 'Center', ch: 2, x: 0.0, y: 1.0, z: 0.0, az: 0, el: 0 },
+        { id: 'LFE',name: 'Subwoofer', ch: 3, x: 0.0, y: 0.0, z: -1.0, isLFE: true },
+        { id: 'SL', name: 'Surround Left', ch: 4, x: -1.0, y: -0.5, z: 0.0, az: 250, el: 0 },
+        { id: 'SR', name: 'Surround Right', ch: 5, x: 1.0, y: -0.5, z: 0.0, az: 110, el: 0 },
+        { id: 'HL', name: 'Height Left (Dome)', ch: 6, x: -0.7, y: 0.5, z: 1.0, az: 315, el: 65, isHeight: true },
+        { id: 'HR', name: 'Height Right (Dome)', ch: 7, x: 0.7, y: 0.5, z: 1.0, az: 45, el: 65, isHeight: true }
+      ]
+    }
+  };
+
+  // 2. Spatial Engine State
+  var SpatialEngine = {
+    ctx: null,
+    isInitialized: false,
+    currentProfile: 'A',
+    masterSurroundGain: 1.0,
+    masterLFEGain: 1.0,
+    masterGainNode: null,
+    surroundGainNode: null,
+    lfeGainNode: null,
+    mergerNode: null,
+    isStereoFallback: false,
+    sources: {}, // id -> source wrapper
+    activeState: null,
+    radarCanvas: null,
+    radarAnimId: null,
+
+    init: function() {
+      if (this.isInitialized) return;
+      try {
+        var AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtxClass) {
+          console.warn('[SpatialEngine] Web Audio API not supported in this browser.');
+          return;
+        }
+        this.ctx = new AudioCtxClass();
+        var maxCh = (this.ctx.destination && this.ctx.destination.maxChannelCount) || 2;
+        console.log('[SpatialEngine] Initialized. Hardware Max Channels:', maxCh);
+        this.setupBusRouting();
+        this.isInitialized = true;
+      } catch(e) {
+        console.warn('[SpatialEngine] AudioContext init deferred until user gesture:', e);
+      }
+    },
+
+    ensureContext: function() {
+      if (!this.ctx) this.init();
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    },
+
+    setupBusRouting: function() {
+      if (!this.ctx) return;
+      var prof = SPEAKER_PROFILES[this.currentProfile] || SPEAKER_PROFILES['A'];
+      var targetChannels = this.isStereoFallback ? 2 : Math.min(prof.channels, this.ctx.destination.maxChannelCount || 2);
+      
+      try {
+        this.ctx.destination.channelCount = targetChannels;
+        this.ctx.destination.channelInterpretation = 'discrete';
+      } catch(e) {
+        // Fallback for strict browser restrictions
+        this.ctx.destination.channelCount = 2;
+      }
+
+      this.masterGainNode = this.ctx.createGain();
+      this.masterGainNode.gain.value = 1.0;
+
+      this.surroundGainNode = this.ctx.createGain();
+      this.surroundGainNode.gain.value = this.masterSurroundGain;
+
+      this.lfeGainNode = this.ctx.createGain();
+      this.lfeGainNode.gain.value = this.masterLFEGain;
+
+      // Channel merger node
+      this.mergerNode = this.ctx.createChannelMerger(targetChannels);
+      this.mergerNode.connect(this.ctx.destination);
+    },
+
+    setProfile: function(profId) {
+      if (!SPEAKER_PROFILES[profId]) return;
+      this.currentProfile = profId;
+      console.log('[SpatialEngine] Switched to profile:', profId);
+      this.setupBusRouting();
+      this.updateAllSourcePositions();
+    },
+
+    setStereoFallback: function(enabled) {
+      this.isStereoFallback = !!enabled;
+      console.log('[SpatialEngine] Stereo Fallback mode:', this.isStereoFallback);
+      this.setupBusRouting();
+      this.updateAllSourcePositions();
+    },
+
+    setSurroundLevel: function(val) {
+      this.masterSurroundGain = Math.max(0, Math.min(2.0, parseFloat(val) || 1.0));
+      if (this.surroundGainNode) {
+        this.surroundGainNode.gain.setValueAtTime(this.masterSurroundGain, this.ctx.currentTime);
+      }
+    },
+
+    setLFELevel: function(val) {
+      this.masterLFEGain = Math.max(0, Math.min(2.0, parseFloat(val) || 1.0));
+      if (this.lfeGainNode) {
+        this.lfeGainNode.gain.setValueAtTime(this.masterLFEGain, this.ctx.currentTime);
+      }
+    },
+
+    // Compute VBAP Speaker Gains from Azimuth, Elevation, Distance
+    calculateSpeakerGains: function(azimuth, elevation, distance, isLFEEligible) {
+      var prof = SPEAKER_PROFILES[this.currentProfile] || SPEAKER_PROFILES['A'];
+      var rad = (azimuth * Math.PI) / 180.0;
+      var elRad = (elevation * Math.PI) / 180.0;
+      
+      // Source Cartesian coordinates on unit sphere
+      var sx = Math.sin(rad) * Math.cos(elRad);
+      var sy = Math.cos(rad) * Math.cos(elRad);
+      var sz = Math.sin(elRad);
+
+      var gains = {};
+      var totalPwr = 0.0;
+
+      prof.speakers.forEach(function(spk){
+        if (spk.isLFE) {
+          // LFE Subwoofer handling
+          gains[spk.id] = isLFEEligible ? 0.85 : 0.0;
+          return;
+        }
+
+        var spkRad = (spk.az * Math.PI) / 180.0;
+        var spkElRad = ((spk.el || 0) * Math.PI) / 180.0;
+        var px = Math.sin(spkRad) * Math.cos(spkElRad);
+        var py = Math.cos(spkRad) * Math.cos(spkElRad);
+        var pz = Math.sin(spkElRad);
+
+        // Dot product / angular proximity
+        var dot = sx * px + sy * py + sz * pz;
+        var weight = Math.max(0.0, dot);
+        // Exponent for spatial focus
+        var g = Math.pow(weight, 1.8);
+        gains[spk.id] = g;
+        totalPwr += g * g;
+      });
+
+      // Normalize gains for constant power
+      if (totalPwr > 0.0001) {
+        var norm = Math.sqrt(totalPwr);
+        prof.speakers.forEach(function(spk){
+          if (!spk.isLFE) {
+            gains[spk.id] = gains[spk.id] / norm;
+          }
+        });
+      } else {
+        // Fallback default stereo center
+        gains['FL'] = 0.707;
+        gains['FR'] = 0.707;
+      }
+
+      // Distance attenuation factor
+      var distFactor = 1.0 / (1.0 + 0.08 * Math.max(0, distance - 1.0));
+      prof.speakers.forEach(function(spk){
+        if (!spk.isLFE) {
+          gains[spk.id] *= distFactor;
+        }
+      });
+
+      return gains;
+    },
+
+    // Register or attach a sound element to the spatial engine
+    attachTrack: function(id, audioObj, initialSpatial) {
+      if (!audioObj) return null;
+      var self = this;
+      var track = {
+        id: id,
+        audio: audioObj,
+        azimuth: (initialSpatial && initialSpatial.az !== undefined) ? initialSpatial.az : 0,
+        elevation: (initialSpatial && initialSpatial.el !== undefined) ? initialSpatial.el : 0,
+        distance: (initialSpatial && initialSpatial.dist !== undefined) ? initialSpatial.dist : 2.0,
+        occlusion: (initialSpatial && initialSpatial.occl !== undefined) ? initialSpatial.occl : 1.0,
+        isLFE: !!(initialSpatial && initialSpatial.isLFE),
+        mediaSource: null,
+        gainNode: null,
+        occlusionFilter: null,
+        pannerNode: null,
+        speakerGainNodes: {},
+        isWebAudioLinked: false
+      };
+
+      this.sources[id] = track;
+      return track;
+    },
+
+    // Link track to Web Audio graph safely (Bypassed to prevent browser CORS muting on file:/// and ensure 100% native audio playback)
+    linkWebAudio: function(id) {
+      var track = this.sources[id];
+      if (!track) return;
+      track.isWebAudioLinked = false;
+      this.updateTrackPosition(id);
+    },
+
+    updateTrackPosition: function(id) {
+      var track = this.sources[id];
+      if (!track) return;
+      
+      // Update Web Audio Panner if linked
+      if (track.pannerNode && this.ctx) {
+        var rad = (track.azimuth * Math.PI) / 180.0;
+        var elRad = (track.elevation * Math.PI) / 180.0;
+        var x = Math.sin(rad) * Math.cos(elRad) * track.distance;
+        var y = Math.cos(rad) * Math.cos(elRad) * track.distance;
+        var z = Math.sin(elRad) * track.distance;
+
+        if (track.pannerNode.positionX) {
+          track.pannerNode.positionX.setValueAtTime(x, this.ctx.currentTime);
+          track.pannerNode.positionY.setValueAtTime(y, this.ctx.currentTime);
+          track.pannerNode.positionZ.setValueAtTime(z, this.ctx.currentTime);
+        } else {
+          track.pannerNode.setPosition(x, y, z);
+        }
+
+        // Occlusion Low-Pass
+        var cutoff = Math.max(400, Math.min(20000, 20000 * track.occlusion * (1.0 / (1.0 + 0.05 * track.distance))));
+        if (track.occlusionFilter) {
+          track.occlusionFilter.frequency.setValueAtTime(cutoff, this.ctx.currentTime);
+        }
+      }
+
+      // Update UI spatial tag
+      var tag = document.getElementById('spat-tag-' + id);
+      if (tag) {
+        var dirTxt = 'Center Front (0°)';
+        var az = ((track.azimuth % 360) + 360) % 360;
+        if (az >= 340 || az <= 20) dirTxt = 'Stage Front (' + az.toFixed(0) + '°)';
+        else if (az > 20 && az < 70) dirTxt = 'Front Right (' + az.toFixed(0) + '°)';
+        else if (az >= 70 && az <= 110) dirTxt = 'Stage Right (' + az.toFixed(0) + '°)';
+        else if (az > 110 && az < 160) dirTxt = 'Rear Right (' + az.toFixed(0) + '°)';
+        else if (az >= 160 && az <= 200) dirTxt = 'Rear Nave (' + az.toFixed(0) + '°)';
+        else if (az > 200 && az < 250) dirTxt = 'Rear Left (' + az.toFixed(0) + '°)';
+        else if (az >= 250 && az <= 290) dirTxt = 'Stage Left (' + az.toFixed(0) + '°)';
+        else if (az > 290 && az < 340) dirTxt = 'Front Left (' + az.toFixed(0) + '°)';
+        
+        tag.textContent = '📍 ' + dirTxt + ' • ' + track.distance.toFixed(1) + 'm';
+      }
+    },
+
+    updateAllSourcePositions: function() {
+      var self = this;
+      Object.keys(this.sources).forEach(function(id){
+        self.updateTrackPosition(id);
+      });
+    },
+
+    // 3. Act III: The 5-State Siege Spatial Sequencer
+    triggerSiegeState: function(stateNum) {
+      this.ensureContext();
+      this.activeState = 'SIEGE_' + stateNum;
+      console.log('[SpatialEngine] Activating Siege State:', stateNum);
+
+      // State definitions
+      switch(stateNum) {
+        case 1: // APPROACHING ARMY
+          this.setTrackSpatial('SFX-D2_WAR', { az: 180, el: 0, dist: 75.0, occl: 0.15 }); // Rear valley, muffled
+          this.setTrackSpatial('SFX-D2_DRUMS', { az: 165, el: 0, dist: 60.0, occl: 0.25, isLFE: true });
+          this.setTrackSpatial('SFX-33A_D2', { az: 0, el: 0, dist: 2.0, occl: 1.0, isLFE: true });
+          break;
+
+        case 2: // CONVENT UNDER ATTACK
+          this.setTrackSpatial('SFX-D2_WAR', { az: 270, el: 5, dist: 8.0, occl: 0.85 }); // Stage Left wall
+          this.setTrackSpatial('SFX-D2_DRUMS', { az: 90, el: 0, dist: 12.0, occl: 0.9, isLFE: true });
+          this.setTrackSpatial('SFX-D2_GATE', { az: 285, el: 0, dist: 4.0, occl: 1.0, isLFE: true }); // Gate Left
+          this.setTrackSpatial('SFX-D2_VO', { az: 270, el: 0, dist: 5.0, occl: 1.0 }); // Sister warning
+          break;
+
+        case 3: // CLARE'S FEAR (Auditory Tunnel / Isolation)
+          this.setTrackSpatial('SFX-D2_WAR', { az: 200, el: 0, dist: 35.0, occl: 0.1 }); // External war pushed back & muffled
+          this.setTrackSpatial('SFX-D2_DRUMS', { az: 160, el: 0, dist: 40.0, occl: 0.15 });
+          this.setTrackSpatial('SFX-33A_D2', { az: 0, el: 0, dist: 0.8, occl: 1.0, isLFE: true }); // Heartbeat intimate center thump
+          break;
+
+        case 4: // DIVINE INTERVENTION
+          this.setTrackSpatial('SFX-CHILD_GOD', { az: 0, el: 10, dist: 1.8, occl: 1.0, isLFE: true }); // Pristine center presence
+          this.setTrackSpatial('SFX-D2_WAR', { az: 180, el: 0, dist: 65.0, occl: 0.08 });
+          this.setTrackSpatial('SFX-26', { az: 0, el: 30, dist: 5.0, occl: 1.0, isLFE: true }); // Shockwave expands
+          break;
+
+        case 5: // SOLDIERS RETREAT
+          this.setTrackSpatial('SFX-D2_WAR', { az: 180, el: -5, dist: 95.0, occl: 0.05 }); // Recedes into distant valley
+          this.setTrackSpatial('SFX-D2_DRUMS', { az: 180, el: 0, dist: 100.0, occl: 0.05 });
+          break;
+      }
+
+      this.highlightSiegeStateButton(stateNum);
+    },
+
+    setTrackSpatial: function(id, coords) {
+      if (!this.sources[id]) {
+        this.sources[id] = { id: id, azimuth: 0, elevation: 0, distance: 2.0, occlusion: 1.0 };
+      }
+      var track = this.sources[id];
+      if (coords.az !== undefined) track.azimuth = coords.az;
+      if (coords.el !== undefined) track.elevation = coords.el;
+      if (coords.dist !== undefined) track.distance = coords.dist;
+      if (coords.occl !== undefined) track.occlusion = coords.occl;
+      if (coords.isLFE !== undefined) track.isLFE = coords.isLFE;
+      this.updateTrackPosition(id);
+    },
+
+    highlightSiegeStateButton: function(stateNum) {
+      document.querySelectorAll('.btn-siege-state').forEach(function(b){
+        b.classList.remove('active');
+      });
+      var activeBtn = document.getElementById('btn-siege-s' + stateNum);
+      if (activeBtn) activeBtn.classList.add('active');
+    },
+
+    // 4. Speaker Test Tone Generator (Pink Noise / Chime Sequence)
+    runSpeakerTestSequence: function() {
+      this.ensureContext();
+      if (!this.ctx) {
+        alert('Please click anywhere on the page first to initialize audio context.');
+        return;
+      }
+
+      var prof = SPEAKER_PROFILES[this.currentProfile] || SPEAKER_PROFILES['A'];
+      var spks = prof.speakers;
+      var self = this;
+      console.log('[SpatialEngine] Running speaker test for ' + prof.name);
+
+      var idx = 0;
+      function playNextChime() {
+        if (idx >= spks.length) {
+          console.log('[SpatialEngine] Speaker test complete.');
+          return;
+        }
+        var spk = spks[idx];
+        self.playTestChimeOnSpeaker(spk, function(){
+          idx++;
+          setTimeout(playNextChime, 450);
+        });
+      }
+      playNextChime();
+    },
+
+    playTestChimeOnSpeaker: function(spk, onDone) {
+      if (!this.ctx) return;
+      var self = this;
+      var osc = this.ctx.createOscillator();
+      var gain = this.ctx.createGain();
+      
+      // Chime frequency: 440 Hz for mains, 80 Hz for Subwoofer
+      osc.type = spk.isLFE ? 'sine' : 'triangle';
+      osc.frequency.value = spk.isLFE ? 65 : (spk.isHeight ? 880 : 440);
+
+      var now = this.ctx.currentTime;
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.exponentialRampToValueAtTime(0.35, now + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+      osc.connect(gain);
+
+      // Flash speaker indicator on radar
+      self.highlightTestingSpeaker(spk.id);
+
+      if (this.mergerNode && spk.ch < (this.ctx.destination.channelCount || 2)) {
+        gain.connect(this.ctx.destination);
+      } else {
+        // Stereo preview balance
+        var pan = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
+        if (pan) {
+          pan.pan.value = (spk.x < 0) ? -0.8 : ((spk.x > 0) ? 0.8 : 0.0);
+          gain.connect(pan);
+          pan.connect(this.ctx.destination);
+        } else {
+          gain.connect(this.ctx.destination);
+        }
+      }
+
+      osc.start(now);
+      osc.stop(now + 0.5);
+      setTimeout(onDone, 500);
+    },
+
+    highlightTestingSpeaker: function(spkId) {
+      this.testingSpeakerId = spkId;
+      var self = this;
+      setTimeout(function(){
+        self.testingSpeakerId = null;
+      }, 500);
+    },
+
+    // 5. 2D Church Spatial Radar Visualizer
+    bindRadarCanvas: function(canvasEl) {
+      this.radarCanvas = canvasEl;
+      if (!canvasEl) return;
+      var self = this;
+      
+      function renderLoop() {
+        self.drawRadar();
+        self.radarAnimId = requestAnimationFrame(renderLoop);
+      }
+      if (this.radarAnimId) cancelAnimationFrame(this.radarAnimId);
+      this.radarAnimId = requestAnimationFrame(renderLoop);
+    },
+
+    drawRadar: function() {
+      var cv = this.radarCanvas;
+      if (!cv) return;
+      var ctx = cv.getContext('2d');
+      var w = cv.width;
+      var h = cv.height;
+      var cx = w / 2;
+      var cy = h / 2;
+      var r = Math.min(cx, cy) - 22;
+
+      // Clear dark background
+      ctx.fillStyle = '#0f1115';
+      ctx.fillRect(0, 0, w, h);
+
+      // Draw Church Architecture Outline
+      ctx.strokeStyle = '#222933';
+      ctx.lineWidth = 1.5;
+      
+      // Sanctuary / Altar Apse (Top semicircle)
+      ctx.beginPath();
+      ctx.arc(cx, cy - r * 0.45, r * 0.45, Math.PI, 2 * Math.PI);
+      ctx.stroke();
+
+      // Nave Walls (Central rectangle)
+      ctx.strokeRect(cx - r * 0.7, cy - r * 0.45, r * 1.4, r * 1.3);
+
+      // L-Shaped Seating Area Highlight
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.06)';
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.22)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      // Shorter leg (East/West) & Longer leg (North/South)
+      ctx.rect(cx - r * 0.65, cy + r * 0.35, r * 1.3, r * 0.45);
+      ctx.rect(cx + r * 0.35, cy - r * 0.35, r * 0.3, r * 0.7);
+      ctx.fill();
+      ctx.stroke();
+
+      // Concentric distance rings
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      [0.33, 0.66, 1.0].forEach(function(pct){
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * pct, 0, 2 * Math.PI);
+        ctx.stroke();
+      });
+
+      // Axis crosshairs
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r);
+      ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy);
+      ctx.stroke();
+
+      // Stage & Actor Center Point
+      ctx.fillStyle = '#d4af37';
+      ctx.beginPath();
+      ctx.arc(cx, cy - r * 0.25, 4, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.font = '10px sans-serif';
+      ctx.fillStyle = '#d4af37';
+      ctx.textAlign = 'center';
+      ctx.fillText('Sanctuary Altar', cx, cy - r * 0.55);
+      ctx.fillStyle = '#888';
+      ctx.fillText('Clare / Station', cx, cy - r * 0.15);
+      ctx.fillText('Rear Nave (Exit)', cx, cy + r * 0.95);
+
+      // Render Speakers for current profile
+      var prof = SPEAKER_PROFILES[this.currentProfile] || SPEAKER_PROFILES['A'];
+      var self = this;
+      prof.speakers.forEach(function(spk){
+        var sx = cx + spk.x * (r * 0.88);
+        var sy = cy - spk.y * (r * 0.88);
+        var isTesting = (self.testingSpeakerId === spk.id);
+
+        ctx.fillStyle = isTesting ? '#2ecc71' : (spk.isHeight ? '#9b59b6' : (spk.isLFE ? '#e67e22' : '#3498db'));
+        ctx.beginPath();
+        ctx.arc(sx, sy, isTesting ? 8 : 5, 0, 2 * Math.PI);
+        ctx.fill();
+
+        ctx.font = '9px monospace';
+        ctx.fillStyle = isTesting ? '#2ecc71' : '#aaa';
+        ctx.textAlign = 'center';
+        ctx.fillText(spk.id, sx, sy + (spk.y > 0 ? -9 : 14));
+      });
+
+      // Render Active Sound Sources (Live Animated Blips)
+      if (global.ST) {
+        Object.keys(global.ST).forEach(function(sid){
+          var s = global.ST[sid];
+          if (!s || !s.playing) return;
+          var sp = self.sources[sid] || { azimuth: 0, distance: 2.0 };
+          var rad = (sp.azimuth * Math.PI) / 180.0;
+          var normDist = Math.min(1.0, sp.distance / 50.0);
+          var bx = cx + Math.sin(rad) * (r * (0.15 + normDist * 0.8));
+          var by = cy - Math.cos(rad) * (r * (0.15 + normDist * 0.8));
+
+          // Blip pulse
+          var pulse = (performance.now() % 1000) / 1000;
+          ctx.strokeStyle = 'rgba(231, 76, 60, ' + (1.0 - pulse) + ')';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(bx, by, 5 + pulse * 12, 0, 2 * Math.PI);
+          ctx.stroke();
+
+          ctx.fillStyle = '#e74c3c';
+          ctx.beginPath();
+          ctx.arc(bx, by, 4.5, 0, 2 * Math.PI);
+          ctx.fill();
+
+          ctx.font = 'bold 9px sans-serif';
+          ctx.fillStyle = '#fff';
+          ctx.textAlign = 'center';
+          ctx.fillText(sid.replace('SFX-', ''), bx, by - 8);
+        });
+      }
+    }
+  };
+
+  global.SpatialEngine = SpatialEngine;
+  global.SPEAKER_PROFILES = SPEAKER_PROFILES;
+
+})(typeof window !== 'undefined' ? window : this);
+
+
+(function(){
+  var SCENES_DATA = [
+  {
+    "scene": "[Pre-Show] House Announcement",
+    "sounds": [
+      {
+        "id": "SFX-PRE_CHIME",
+        "label": "[SFX-PRE-01] Pre-Show Low Chimes (Call to Attention)",
+        "defCue": 0.0,
+        "defPan": 0.0,
+        "optLabels": [
+          "Opt 1: Liturgical Low Chimes (3-Tone Solemn Cadence: D3-F3-A2)",
+          "Opt 2: Monastic Deep Bronze Sanctuary Bell (Solemn C3 Toll)",
+          "Opt 3: Westminster Low Chimes (4-Tone Traditional Call)"
+        ],
+        "o1": "SFX/00_PRE_SHOW/SFX-PRE_CHIME_v01_LITURGICAL.wav",
+        "o2": "SFX/00_PRE_SHOW/SFX-PRE_CHIME_v02_MONASTIC.wav",
+        "o3": "SFX/00_PRE_SHOW/SFX-PRE_CHIME_v03_WESTMINSTER.wav"
+      },
+      {
+        "id": "SFX-PRE_ANNOUNCEMENT",
+        "label": "[SFX-PRE-02] Pre-Show House Announcement",
+        "defCue": 8.0,
+        "defPan": 0.0,
+        "optLabels": [
+          "Opt 1: Clean House Announcement (Studio Clear)",
+          "Opt 2: Sanctuary PA with Liturgical Chime",
+          "Opt 3: Warm Intimate Pre-Show Proximity VO"
+        ],
+        "o1": "SFX/00_PRE_SHOW/SFX-PRE_ANNOUNCEMENT_v01_CLEAN.wav",
+        "o2": "SFX/00_PRE_SHOW/SFX-PRE_ANNOUNCEMENT_v02_CHIME_SANCTUARY.wav",
+        "o3": "SFX/00_PRE_SHOW/SFX-PRE_ANNOUNCEMENT_v03_WARM_PROXIMITY.wav"
+      }
+    ]
+  },
+  {
+    "scene": "[Act 0, Sc 1] Christ on the Cross",
+    "sounds": [
+      {
+        "id": "SFX-01A",
+        "label": "[SFX-01A] Clare's Initial Breath (Woman's Calming Breath)",
+        "defCue": 0.0,
+        "optLabels": ["Opt 1: Calming Breath (Direct 22s)", "Opt 2: Cathedral Reverb Halo (22s)", "Opt 3: Intimate Warm Tone (22s)"],
+        "o1": "SFX/P1_PROLOGUE/SFX-01A_CALM_BREATH_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-01A_CALM_BREATH_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-01A_CALM_BREATH_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-01",
+        "label": "[SFX-01] TV Turn On",
+        "defCue": 4.0,
+        "o1": "SFX/P1_PROLOGUE/SFX-01_TV_TURN_ON_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-01_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-01_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-02",
+        "label": "[SFX-02] Mouse Clicks & Interface",
+        "defCue": 7.0,
+        "o1": "SFX/P1_PROLOGUE/SFX-02_MOUSE_CLICKS_INTERFACE_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-02_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-02_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-02B",
+        "label": "[SFX-02B] Instagram & Social Media Alerts",
+        "defCue": 10.0,
+        "o1": "SFX/P1_PROLOGUE/SFX-02B_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-02B_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-02B_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-02C",
+        "label": "[SFX-02C] Tinder Notification Alert",
+        "defCue": 11.5,
+        "optLabels": ["Opt 1: Clean Tinder Chime (Direct)", "Opt 2: Cathedral Reverb Chime", "Opt 3: Slapback Echo Chime"],
+        "o1": "SFX/P1_PROLOGUE/SFX-02C_TINDER_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-02C_TINDER_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-02C_TINDER_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-03",
+        "label": "[SFX-03] Traffic & City Bed",
+        "defCue": 13.0,
+        "o1": "SFX/P1_PROLOGUE/SFX-03_TRAFFIC_CITYBED_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-03_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-03_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-04A",
+        "label": "[SFX-04A] Breaking Headline News",
+        "defCue": 16.0,
+        "optLabels": ["Opt 1: TV Breaking News (Anchor Duo)", "Opt 2: Live Newsroom Floor (Acoustic Room)", "Opt 3: AM Radio Broadcast EQ"],
+        "o1": "SFX/P1_PROLOGUE/SFX-04A_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-04A_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-04A_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-04B",
+        "label": "[SFX-04B] News of War & Conflict Sirens",
+        "defCue": 20.0,
+        "defPan": -0.55,
+        "optLabels": ["Opt 1: Live War Correspondent (Balanced)", "Opt 2: Stage Left War Anchor (Panned)", "Opt 3: Shortwave Military Radio Filter"],
+        "o1": "SFX/P1_PROLOGUE/SFX-04B_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-04B_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-04B_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-04C",
+        "label": "[SFX-04C] Floods & Climate Disaster News",
+        "defCue": 24.0,
+        "defPan": 0.55,
+        "optLabels": ["Opt 1: Flash Flood EAS Alert (Balanced)", "Opt 2: Stage Right Climate Anchor (Panned)", "Opt 3: Emergency Transistor Radio EQ"],
+        "o1": "SFX/P1_PROLOGUE/SFX-04C_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-04C_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-04C_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-05",
+        "label": "[SFX-05] Ambulance Siren",
+        "defCue": 28.0,
+        "optLabels": ["Opt 1: Passing Siren (Balanced)", "Opt 2: Doppler Pan Sweep (Stage Right ➜ Stage Left)", "Opt 3: Distant City Emergency"],
+        "o1": "SFX/P1_PROLOGUE/SFX-05_AMBULANCE_EMERGENCY_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-05_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-05_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-06",
+        "label": "[SFX-06] Commercials & Shopping Ads",
+        "defCue": 32.0,
+        "optLabels": ["Opt 1: Rapid-Fire TV Commercials & Beeps", "Opt 2: Shopping Mall P.A. Acoustic", "Opt 3: Hyper-Compressed Radio Promo Punch"],
+        "o1": "SFX/P1_PROLOGUE/SFX-06_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-06_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-06_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-07",
+        "label": "[SFX-07] Digital Glitch & System Breakdown",
+        "defCue": 35.0,
+        "optLabels": ["Opt 1: Full Glitch Attack (12s)", "Opt 2: Cathedral Reverb Glitch", "Opt 3: Lo-Fi Radio Glitch"],
+        "o1": "SFX/P1_PROLOGUE/SFX-07_GLITCH_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-07_GLITCH_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-07_GLITCH_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-06B",
+        "label": "[SFX-06B] 13th Century Historical Bleed",
+        "defCue": 38.0,
+        "o1": "SFX/P1_PROLOGUE/SFX-06B_REC_v01_RAW.wav",
+        "o2": "SFX/P1_PROLOGUE/SFX-06B_REC_v02_RAW.wav",
+        "o3": "SFX/P1_PROLOGUE/SFX-06B_REC_v03_RAW.wav"
+      }
+    ]
+  },
+  {
+    "scene": "[Act I, Sc 2] The Meeting of Francis",
+    "sounds": [
+      {
+        "id": "SFX-08",
+        "label": "[SFX-08] Medieval Atmosphere",
+        "defCue": 0.0,
+        "o1": "SFX/A1_MARKET/SFX-08_REC_v01_RAW.wav",
+        "o2": "SFX/A1_MARKET/SFX-08_REC_v02_RAW.wav",
+        "o3": "SFX/A1_MARKET/SFX-08_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-09",
+        "label": "[SFX-09] 13th C. Assisi Market (Carts & Calls)",
+        "defCue": 6.0,
+        "optLabels": ["Opt 1: Market Square (Full Panoramic)", "Opt 2: Left Alley Merchants (Panned Left)", "Opt 3: Right Carts & Street Bells (Panned Right)"],
+        "o1": "SFX/A1_MARKET/SFX-09_REC_v01_RAW.wav",
+        "o2": "SFX/A1_MARKET/SFX-09_REC_v02_RAW.wav",
+        "o3": "SFX/A1_MARKET/SFX-09_REC_v03_RAW.wav"
+      }
+    ]
+  },
+  {
+    "scene": "[Act I, Sc 3] The Escape",
+    "sounds": [
+      {
+        "id": "SFX-33A",
+        "label": "[SFX-33A] Canonical Heartbeat (Circling)",
+        "defCue": 0.0,
+        "o1": "SFX/00_GLOBAL/SFX-33A_HB_CANONICAL_REC_v01_RAW.wav",
+        "o2": "SFX/00_GLOBAL/SFX-33A_REC_v02_RAW.wav",
+        "o3": "SFX/00_GLOBAL/SFX-33A_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-10A",
+        "label": "[SFX-10A] Palm Sunday Street Gathering (Bells & Chants)",
+        "defCue": 18.0,
+        "o1": "SFX/A2_THE_PASSION/SFX-10A_REC_v01_RAW.wav",
+        "o2": "SFX/A2_THE_PASSION/SFX-10A_REC_v02_RAW.wav",
+        "o3": "SFX/A2_THE_PASSION/SFX-10A_REC_v03_RAW.wav"
+      }
+    ]
+  },
+  {
+    "scene": "[Act II, Sc 4] San Damiano",
+    "sounds": [
+      {
+        "id": "SFX-35",
+        "label": "[SFX-35] Lightning Strike",
+        "defCue": 0.0,
+        "optLabels": ["Opt 1: Sharp Crack", "Opt 2: Thunder Reverb Boom", "Opt 3: Distant Echo Rumble"],
+        "o1": "SFX/B1_SAN_DAMIANO/SFX-35_LIGHTNING_REC_v01_RAW.wav",
+        "o2": "SFX/B1_SAN_DAMIANO/SFX-35_REC_v02_RAW.wav",
+        "o3": "SFX/B1_SAN_DAMIANO/SFX-35_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-36",
+        "label": "[SFX-36] Voice of God (\"Repair my house\")",
+        "defCue": 2.5,
+        "optLabels": ["Opt 1: Direct Sacred Command (Take 2)", "Opt 2: Cathedral Reverb Halo & Sub-Bass (Take 1)", "Opt 3: Mystical Crucifix Vision"],
+        "o1": "SFX/B1_SAN_DAMIANO/SFX-36_VOICEOFGOD_v01_RAW.wav",
+        "o2": "SFX/B1_SAN_DAMIANO/SFX-36_VOICEOFGOD_v02_RAW.wav",
+        "o3": "SFX/B1_SAN_DAMIANO/SFX-36_VOICEOFGOD_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-15",
+        "label": "[SFX-15] Cicadas (Deus, Deus)",
+        "defCue": 17.0,
+        "defOpt": 1,
+        "optLabels": ["Opt 1: Close Summer Cicadas", "Opt 2: Ambient Field", "Opt 3: Distant Drone"],
+        "o1": "SFX/B1_SAN_DAMIANO/SFX-15_REC_v01_RAW.wav",
+        "o2": "SFX/B1_SAN_DAMIANO/SFX-15_REC_v02_RAW.wav",
+        "o3": "SFX/B1_SAN_DAMIANO/SFX-15_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-34",
+        "label": "[SFX-34] Cross Glitch (Father's intrusion)",
+        "defCue": 25.0,
+        "optLabels": ["Opt 1: Full Glitch Attack (12s)", "Opt 2: Cathedral Reverb Glitch", "Opt 3: Lo-Fi Radio Glitch"],
+        "o1": "SFX/B1_SAN_DAMIANO/SFX-34_GLITCH_REC_v01_RAW.wav",
+        "o2": "SFX/B1_SAN_DAMIANO/SFX-34_GLITCH_REC_v02_RAW.wav",
+        "o3": "SFX/B1_SAN_DAMIANO/SFX-34_GLITCH_REC_v03_RAW.wav"
+      }
+    ]
+  },
+  {
+    "scene": "[Act II, Sc 5] Sisterhood & Passing",
+    "sounds": [
+      {
+        "id": "SFX-16_WATER",
+        "label": "[SFX-16] Trickling Water (Stream Source)",
+        "defCue": 0.0,
+        "defPan": -0.35,
+        "optLabels": ["Opt 1: Balanced Stream (Full Bed)", "Opt 2: Stage Left Courtyard Spring (Panned Left)", "Opt 3: Cavern Echo Stream"],
+        "o1": "SFX/C2_SISTERHOOD/SFX-16_WATER_REC_v01_RAW.wav",
+        "o2": "SFX/C2_SISTERHOOD/SFX-16_WATER_REC_v02_RAW.wav",
+        "o3": "SFX/C2_SISTERHOOD/SFX-16_WATER_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-17_CANTICLE",
+        "label": "[SFX-17] Canticle of the Creatures (Simon De Voil)",
+        "defCue": 12.0,
+        "optLabels": ["Opt 1: Simon De Voil (Acoustic)", "Opt 2: Reverb Sanctuary", "Opt 3: Ambient Echo"],
+        "o1": "SFX/C2_SISTERHOOD/SFX-17_CANTICLE_REC_v01_RAW.wav",
+        "o2": "SFX/C2_SISTERHOOD/SFX-17_CANTICLE_REC_v02_RAW.wav",
+        "o3": "SFX/C2_SISTERHOOD/SFX-17_CANTICLE_REC_v03_RAW.wav"
+      }
+    ]
+  },
+  {
+    "scene": "[Act III, Sc 6] Letters to Prague",
+    "sounds": [
+      {
+        "id": "SFX-23",
+        "label": "[SFX-23] Quill Pen Writing on Parchment",
+        "defCue": 0.0,
+        "defPan": 0.40,
+        "optLabels": ["Opt 1: Crisp Quill Scratch (Direct 68s)", "Opt 2: Stage Right Writing Desk (Panned Right)", "Opt 3: Gentle Soft Writing"],
+        "o1": "SFX/B1_SAN_DAMIANO/SFX-23_QUILL_REC_v01_RAW.wav",
+        "o2": "SFX/B1_SAN_DAMIANO/SFX-23_QUILL_REC_v02_RAW.wav",
+        "o3": "SFX/B1_SAN_DAMIANO/SFX-23_QUILL_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-37",
+        "label": "[SFX-37] Agnes Letter VO (\"Dear Agnes of Prague...\")",
+        "defCue": 0.0,
+        "defPan": -0.20,
+        "defLoop": false,
+        "optLabels": ["Opt 1: Direct Sacred Intimacy (Clare's Cell)", "Opt 2: Letter Writing Bed (+ Quill Scratch Overlay)", "Opt 3: Cloister Reverb Halo (Stone Room Decay)"],
+        "o1": "SFX/D1_LETTER/SFX-37_AGNES_VO_v01_RAW.wav",
+        "o2": "SFX/D1_LETTER/SFX-37_AGNES_VO_v02_RAW.wav",
+        "o3": "SFX/D1_LETTER/SFX-37_AGNES_VO_v03_RAW.wav"
+      }
+    ]
+  },
+  {
+    "scene": "[Act III, Sc 7] The Siege",
+    "sounds": [
+      {
+        "id": "SFX-D2_DRUMS",
+        "label": "[SFX-D2] Medieval War Drums (Der Wikinger)",
+        "defCue": 0.0,
+        "defPan": 0.2,
+        "defLoop": true,
+        "optLabels": ["Opt 1: Full War Drums (142.5s)", "Opt 2: Heavy Sub-Bass Pulsing Drums", "Opt 3: Distant Valley Siege Drums"],
+        "o1": "SFX/D2_SIEGE/SFX-D2_DRUMS_v01_RAW.wav",
+        "o2": "SFX/D2_SIEGE/SFX-D2_DRUMS_v02_RAW.wav",
+        "o3": "SFX/D2_SIEGE/SFX-D2_DRUMS_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-D2_WAR",
+        "label": "[SFX-D2] Medieval War Soundscape (SoundofTime)",
+        "defCue": 6.0,
+        "defPan": -0.2,
+        "defLoop": true,
+        "optLabels": ["Opt 1: Canonical War Soundscape (17.6s)", "Opt 2: Convent Interior Muffled (Stone Wall)", "Opt 3: Wide Valley Reverb"],
+        "o1": "SFX/D2_SIEGE/SFX-D2_WAR_v01_RAW.wav",
+        "o2": "SFX/D2_SIEGE/SFX-D2_WAR_v02_RAW.wav",
+        "o3": "SFX/D2_SIEGE/SFX-D2_WAR_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-D2_FB1",
+        "label": "[SFX-D2_FB1] Flashback 1: Father's Fury (\"You dare to walk away...\")",
+        "defCue": 6.0,
+        "defPan": -0.35,
+        "defLoop": false,
+        "optLabels": ["Opt 1: Glitch Flashback (Direct Vocal Focus)", "Opt 2: Distant Memory (Echo / Stone Room Decay)", "Opt 3: Temporal Warp (Reverse Tape Flutter & Sub Pulse)"],
+        "o1": "SFX/D2_SIEGE/SFX-D2_FB1_FATHER_v01_RAW.wav",
+        "o2": "SFX/D2_SIEGE/SFX-D2_FB1_FATHER_v02_RAW.wav",
+        "o3": "SFX/D2_SIEGE/SFX-D2_FB1_FATHER_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-D2_GATE",
+        "label": "[SFX-D2_GATE] Convent Defense (Oak Gate Slam & Alarm Bells)",
+        "defCue": 13.0,
+        "defPan": -0.4,
+        "defLoop": true,
+        "optLabels": ["Opt 1: Massive Oak Gate Slam & Iron Bolt Barring", "Opt 2: Sanctuary Alarm Bells + Heavy Gate Slam", "Opt 3: Rushing Footsteps into Heavy Gate Slam"],
+        "o1": "SFX/D2_SIEGE/SFX-D2_GATE_v01_RAW.wav",
+        "o2": "SFX/D2_SIEGE/SFX-D2_GATE_v02_RAW.wav",
+        "o3": "SFX/D2_SIEGE/SFX-D2_GATE_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-D2_FB2",
+        "label": "[SFX-D2_FB2] Flashback 2: Clare's Destiny (\"My life was already written...\")",
+        "defCue": 16.5,
+        "defPan": 0.0,
+        "defLoop": false,
+        "optLabels": ["Opt 1: Intimate Whisper (Sacred Proximity)", "Opt 2: Sanctuary Echo (Cathedral Reverberance)", "Opt 3: Time Distortion (Tape Stop & Slow Decay)"],
+        "o1": "SFX/D2_SIEGE/SFX-D2_FB2_CLARE_v01_RAW.wav",
+        "o2": "SFX/D2_SIEGE/SFX-D2_FB2_CLARE_v02_RAW.wav",
+        "o3": "SFX/D2_SIEGE/SFX-D2_FB2_CLARE_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-D2_VO",
+        "label": "[SFX-D2_VO] Sister's Warning VO (\"The soldiers are coming!\")",
+        "defCue": 23.0,
+        "defPan": -0.25,
+        "defLoop": false,
+        "optLabels": ["Opt 1: Stone Cloister Reverb (Vocal Focus)", "Opt 2: Sanctuary Defense (Alarm Bells & Early Gate Slam)", "Opt 3: Spatial Panic Pan (Continuous Bells & 50% Gate Slam)"],
+        "o1": "SFX/D2_SIEGE/SFX-D2_VO_v01_RAW.wav",
+        "o2": "SFX/D2_SIEGE/SFX-D2_VO_v02_RAW.wav",
+        "o3": "SFX/D2_SIEGE/SFX-D2_VO_v03_RAW.wav"
+      }
+    ]
+  },
+  {
+    "scene": "[Act III, Sc 7-2] Eucharistic Miracle",
+    "sounds": [
+      {
+        "id": "SFX-26",
+        "label": "[SFX-26] Divine Warp / Time Travel Shockwave",
+        "defCue": 0.0,
+        "defLoop": false,
+        "optLabels": ["Opt 1: Direct Time Travel Warp (5.6s)", "Opt 2: Cathedral Reverb Warp", "Opt 3: Sub-Bass Heavy Warp"],
+        "o1": "SFX/D2_SIEGE/SFX-26_TIMETRAVEL_REC_v01_RAW.wav",
+        "o2": "SFX/D2_SIEGE/SFX-26_TIMETRAVEL_REC_v02_RAW.wav",
+        "o3": "SFX/D2_SIEGE/SFX-26_TIMETRAVEL_REC_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-CHILD_GOD",
+        "label": "[SFX-CG] Voice of Christ as a Child (\"I will always protect you\")",
+        "defCue": 4.6,
+        "defLoop": false,
+        "optLabels": ["Opt 1: Clean Vocal (Direct)", "Opt 2: Cathedral Reverb Halo", "Opt 3: Warm Intimate Tone"],
+        "o1": "SFX/D2_SIEGE/SFX-CHILD_GOD_REC_v01_RAW.wav",
+        "o2": "SFX/D2_SIEGE/SFX-CHILD_GOD_REC_v02_RAW.wav",
+        "o3": "SFX/D2_SIEGE/SFX-CHILD_GOD_REC_v03_RAW.wav",
+        "subOctLabels": ["Opt 1: Clean Vocal + Divine Presence Glow", "Opt 2: Cathedral Halo + Divine Presence Glow", "Opt 3: Warm Intimate + Divine Presence Glow"],
+        "subOct1": "SFX/D2_SIEGE/SFX-CHILD_GOD_SUBOCT_v01_RAW.wav",
+        "subOct2": "SFX/D2_SIEGE/SFX-CHILD_GOD_SUBOCT_v02_RAW.wav",
+        "subOct3": "SFX/D2_SIEGE/SFX-CHILD_GOD_SUBOCT_v03_RAW.wav",
+        "slowLabels": ["Opt 1: Sacred Child (Direct Slow 4.3s)", "Opt 2: Cathedral Halo (Mysterious Sacred Slow 4.8s)", "Opt 3: Warm Intimate Tone (Sacred Slow 4.8s)"],
+        "slow1": "SFX/D2_SIEGE/SFX-CHILD_GOD_REC_SLOW_v01_RAW.wav",
+        "slow2": "SFX/D2_SIEGE/SFX-CHILD_GOD_REC_SLOW_v02_RAW.wav",
+        "slow3": "SFX/D2_SIEGE/SFX-CHILD_GOD_REC_SLOW_v03_RAW.wav",
+        "subOctSlowLabels": ["Opt 1: Sacred Child + Divine Glow (Slow 4.3s)", "Opt 2: Cathedral Halo + Divine Glow (Slow 4.8s)", "Opt 3: Warm Intimate + Divine Glow (Slow 4.8s)"],
+        "subOctSlow1": "SFX/D2_SIEGE/SFX-CHILD_GOD_SUBOCT_SLOW_v01_RAW.wav",
+        "subOctSlow2": "SFX/D2_SIEGE/SFX-CHILD_GOD_SUBOCT_SLOW_v02_RAW.wav",
+        "subOctSlow3": "SFX/D2_SIEGE/SFX-CHILD_GOD_SUBOCT_SLOW_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-33A_D2",
+        "label": "[SFX-33A] Canonical Heartbeat (Siege Prayer & Letter 2)",
+        "defCue": 6.6,
+        "defLoop": true,
+        "optLabels": ["Opt 1: Intimate Pulse", "Opt 2: Sub-Bass Reverb", "Opt 3: Muffled Throbbing"],
+        "o1": "SFX/00_GLOBAL/SFX-33A_HB_CANONICAL_REC_v01_RAW.wav",
+        "o2": "SFX/00_GLOBAL/SFX-33A_REC_v02_RAW.wav",
+        "o3": "SFX/00_GLOBAL/SFX-33A_REC_v03_RAW.wav"
+      }
+    ]
+  },
+  {
+    "scene": "[Act IV, Sc 8] The Christmas Vision",
+    "sounds": [
+      {
+        "id": "SFX-38_CHRISTMAS_MASS",
+        "label": "[SFX-38] Christmas Mass Liturgy & Chants (15m Bed)",
+        "defCue": 0.0,
+        "defPan": 0.0,
+        "optLabels": ["Opt 1: Full Sacred Liturgy Bed (15:00 min)", "Opt 2: Cathedral Reverb Overlay (15:00 min)", "Opt 3: Mystical Vision Swell (15:00 min)"],
+        "o1": "SFX/D6_CHRISTMAS_MASS/SFX-38_CHRISTMAS_MASS_v01_RAW.wav",
+        "o2": "SFX/D6_CHRISTMAS_MASS/SFX-38_CHRISTMAS_MASS_v02_RAW.wav",
+        "o3": "SFX/D6_CHRISTMAS_MASS/SFX-38_CHRISTMAS_MASS_v03_RAW.wav"
+      },
+      {
+        "id": "SFX-23_PAPAL",
+        "label": "[SFX-23] Papal Seal & Document Tactile Cue",
+        "defCue": 15.0,
+        "defPan": 0.35,
+        "optLabels": ["Opt 1: Crisp Parchment & Seal Presentation", "Opt 2: Stage Right Desk Acoustics", "Opt 3: Soft Sacred Reverence"],
+        "o1": "SFX/B1_SAN_DAMIANO/SFX-23_QUILL_REC_v01_RAW.wav",
+        "o2": "SFX/B1_SAN_DAMIANO/SFX-23_QUILL_REC_v02_RAW.wav",
+        "o3": "SFX/B1_SAN_DAMIANO/SFX-23_QUILL_REC_v03_RAW.wav"
+      }
+    ]
+  },
+  {
+    "scene": "[Act IV, Sc 9] Final Gaze & Blackout",
+    "sounds": [
+      {
+        "id": "SFX-39",
+        "label": "[SFX-39] The Story Of St Clare MMO (Backtrack)",
+        "defCue": 0.0,
+        "defPan": 0.0,
+        "optLabels": ["Opt 1: The Story Of St Clare MMO (24-bit)", "Opt 2: Universal 16-bit Master"],
+        "o1": "SFX/D6_CHRISTMAS_MASS/The_Story_Of_St_Clare_MMO.wav",
+        "o2": "SFX/D6_CHRISTMAS_MASS/SFX-39_ST_CLARE_MMO_v01_RAW.wav"
+      }
+    ]
+  }
+];
+  var ST = {};
+
+  var CUE_SPATIAL_REGISTRY = {
+    "SFX-PRE_CHIME": { az: 0, el: 25, dist: 4.0, occl: 1.0, isSurround: true },
+    "SFX-PRE_ANNOUNCEMENT": { az: 0, el: 10, dist: 2.5, occl: 1.0, isSurround: true },
+    "SFX-01A": { az: 0, el: 0, dist: 1.5, occl: 1.0 },
+    "SFX-01": { az: 0, el: 0, dist: 3.0, occl: 1.0 },
+    "SFX-02": { az: 0, el: 0, dist: 4.0, occl: 1.0 },
+    "SFX-02B": { az: 290, el: 10, dist: 3.0, occl: 1.0 },
+    "SFX-02C": { az: 70, el: 10, dist: 3.0, occl: 1.0 },
+    "SFX-03": { az: 180, el: 0, dist: 25.0, occl: 0.7, isSurround: true },
+    "SFX-04A": { az: 0, el: 0, dist: 3.0, occl: 1.0 },
+    "SFX-04B": { az: 270, el: 0, dist: 12.0, occl: 0.9 },
+    "SFX-04C": { az: 90, el: 0, dist: 12.0, occl: 0.9 },
+    "SFX-05": { az: 80, el: 0, dist: 25.0, occl: 0.8 },
+    "SFX-06": { az: 0, el: 0, dist: 2.5, occl: 1.0 },
+    "SFX-07": { az: 0, el: 0, dist: 1.0, occl: 1.0 },
+    "SFX-06B": { az: 180, el: 0, dist: 35.0, occl: 0.5 },
+    "SFX-08": { az: 0, el: 0, dist: 8.0, occl: 1.0 },
+    "SFX-09": { az: 130, el: 0, dist: 15.0, occl: 0.9 },
+    "SFX-33A": { az: 0, el: 0, dist: 1.0, occl: 1.0, isLFE: true },
+    "SFX-10A": { az: 180, el: 25, dist: 20.0, occl: 0.85, isSurround: true },
+    "SFX-35": { az: 0, el: 75, dist: 12.0, occl: 1.0, isHeight: true },
+    "SFX-36": { az: 0, el: 15, dist: 2.5, occl: 1.0, isLFE: true },
+    "SFX-15": { az: 0, el: 20, dist: 8.0, occl: 1.0, isSurround: true },
+    "SFX-34": { az: 315, el: 0, dist: 3.0, occl: 1.0 },
+    "SFX-16_WATER": { az: 290, el: 0, dist: 3.0, occl: 1.0 },
+    "SFX-17_CANTICLE": { az: 0, el: 0, dist: 4.0, occl: 1.0 },
+    "SFX-23": { az: 75, el: 0, dist: 2.0, occl: 1.0 },
+    "SFX-37": { az: 290, el: 0, dist: 2.5, occl: 1.0 },
+    "SFX-D2_WAR": { az: 180, el: 0, dist: 75.0, occl: 0.15 },
+    "SFX-D2_DRUMS": { az: 165, el: 0, dist: 60.0, occl: 0.25, isLFE: true },
+    "SFX-D2_VO": { az: 270, el: 0, dist: 5.0, occl: 1.0 },
+    "SFX-D2_GATE": { az: 285, el: 0, dist: 4.0, occl: 1.0, isLFE: true },
+    "SFX-D2_FB1": { az: 315, el: 10, dist: 2.5, occl: 0.95 },
+    "SFX-D2_FB2": { az: 0, el: 0, dist: 1.2, occl: 1.0 },
+    "SFX-33A_D2": { az: 0, el: 0, dist: 1.0, occl: 1.0, isLFE: true },
+    "SFX-CHILD_GOD": { az: 0, el: 10, dist: 1.8, occl: 1.0, isLFE: true },
+    "SFX-26": { az: 0, el: 30, dist: 5.0, occl: 1.0, isLFE: true },
+    "SFX-38_CHRISTMAS_MASS": { az: 0, el: 20, dist: 35.0, occl: 0.6, isSurround: true },
+    "SFX-23_PAPAL": { az: 70, el: 0, dist: 2.5, occl: 1.0 },
+    "SFX-39": { az: 0, el: 0, dist: 3.0, occl: 1.0, isSurround: true }
+  };
+
+  var SC_STATE = {};
+  var STORAGE_KEY = 'to_gaze_soundboard_sequencer_v30';
+
+  
+  var currentTab = localStorage.getItem('to_gaze_active_tab') || 'ALL';
+
+  function updateTabPlayingState(scId, isPlaying) {
+    var btn = document.querySelector('.scene-tab-btn[data-tab-id="' + scId + '"]');
+    if (btn) {
+      if (isPlaying) btn.classList.add('playing');
+      else btn.classList.remove('playing');
+    }
+  }
+
+  function updateAllTabsPlayingState(isPlaying) {
+    document.querySelectorAll('.scene-tab-btn').forEach(function(b){
+      if (isPlaying) b.classList.add('playing');
+      else b.classList.remove('playing');
+    });
+  }
+
+  function switchTab(tabId) {
+    currentTab = tabId;
+    localStorage.setItem('to_gaze_active_tab', tabId);
+
+    document.querySelectorAll('.scene-tab-btn').forEach(function(b){
+      if (b.getAttribute('data-tab-id') === tabId) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    SCENES_DATA.forEach(function(scData){
+      var scId = safeId(scData.scene);
+      var sec = document.getElementById('sc-sec-' + scId);
+      if (!sec) return;
+      if (tabId === 'ALL' || tabId === scId) {
+        sec.style.display = 'block';
+      } else {
+        sec.style.display = 'none';
+      }
+    });
+  }
+
+  function safeId(str) {
+    return str.replace(/[^a-zA-Z0-9]/g, '_');
+  }
+
+  function formatTime(sec) {
+    if (isNaN(sec) || sec < 0) sec = 0;
+    var m = Math.floor(sec / 60);
+    var s = (sec % 60).toFixed(1);
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  // --- Audio Volume & Fader Engine (Pure HTML5 Audio, zero CORS/file protocol restrictions) ---
+  function getTrackVolume(id) {
+    var s = ST[id];
+    if (!s) return 0.85;
+    if (s.currentVolume !== undefined) return s.currentVolume;
+    if (s.savedVolume !== undefined) return s.savedVolume;
+    return s.audio ? s.audio.volume : 0.85;
+  }
+
+  function setTrackVolume(id, vol) {
+    var s = ST[id];
+    if (!s) return;
+    vol = Math.max(0, Math.min(1.0, vol));
+    s.currentVolume = vol;
+    if (s.audio) {
+      s.audio.volume = vol;
+    }
+  }
+
+  function getTrackPan(id) {
+    var s = ST[id];
+    if (!s) return 0;
+    return s.savedPan !== undefined ? s.savedPan : 0;
+  }
+
+  function setTrackPan(id, panVal) {
+    var s = ST[id];
+    if (!s) return;
+    panVal = Math.max(-1.0, Math.min(1.0, parseFloat(panVal) || 0));
+    s.savedPan = panVal;
+    var pv = document.getElementById("pv-" + id);
+    if (pv) {
+      var txt = "CTR";
+      if (panVal < -0.05) txt = "L " + Math.round(Math.abs(panVal) * 100) + "%";
+      else if (panVal > 0.05) txt = "R " + Math.round(panVal * 100) + "%";
+      pv.textContent = txt;
+    }
+    // Update spatial engine azimuth in real time
+    if (typeof SpatialEngine !== 'undefined') {
+      var mappedAz = panVal * 90.0; // -1 -> -90 (Left 270), +1 -> +90 (Right 90)
+      if (mappedAz < 0) mappedAz += 360.0;
+      SpatialEngine.setTrackSpatial(id, { az: mappedAz });
+    }
+  }
+
+  function cancelFades(id) {
+    var s = ST[id];
+    if (s) {
+      if (s.fadeInterval) {
+        clearInterval(s.fadeInterval);
+        s.fadeInterval = null;
+      }
+      if (s.slowCrossfadeInterval) {
+        clearInterval(s.slowCrossfadeInterval);
+        s.slowCrossfadeInterval = null;
+      }
+      s.isSlowCrossfading = false;
+    }
+    var bFin = document.getElementById('bfin-' + id);
+    var bFout = document.getElementById('bfout-' + id);
+    var bSlow = document.getElementById('btn-slowfade-' + id);
+    var meterWrap = document.getElementById('slowfade-meter-' + id);
+    var meterBar = document.getElementById('slowfade-bar-' + id);
+    var box = document.getElementById('bx-' + id);
+    var vlIn = document.getElementById('vl-' + id);
+    var vlvLbl = document.getElementById('vlv-' + id);
+
+    if (bFin) bFin.classList.remove('fading');
+    if (bFout) bFout.classList.remove('fading');
+    if (meterWrap) meterWrap.style.display = 'none';
+    if (meterBar) meterBar.style.width = '100%';
+    if (box) box.classList.remove('slowfading');
+    if (s && s.savedVolume !== undefined) {
+      if (vlIn) vlIn.value = s.savedVolume;
+      if (vlvLbl) vlvLbl.textContent = Math.round(s.savedVolume * 100) + '%';
+    }
+    if (bSlow) {
+      bSlow.classList.remove('crossfading');
+      var dur = (s && s.slowFadeSec) ? s.slowFadeSec : 30;
+      bSlow.innerHTML = '⏳ SLOW CROSSFADE OUT (<span id="slowfade-lbl-' + id + '">' + dur + 's</span>)';
+    }
+  }
+
+  function fadeInAudio(id, targetVol, durationSec, onDone, startFromCurrent) {
+    var s = ST[id];
+    if (!s || !s.audio) return;
+    cancelFades(id);
+
+    var vlIn = document.getElementById('vl-' + id);
+    var vlvLbl = document.getElementById('vlv-' + id);
+
+    if (durationSec <= 0) {
+      setTrackVolume(id, targetVol);
+      if (vlIn) vlIn.value = targetVol;
+      if (vlvLbl) vlvLbl.textContent = Math.round(targetVol * 100) + '%';
+      if (onDone) onDone();
+      return;
+    }
+
+    var startVol = startFromCurrent ? Math.min(targetVol, Math.max(0, getTrackVolume(id))) : 0;
+    setTrackVolume(id, startVol);
+    if (vlIn) vlIn.value = startVol;
+    if (vlvLbl) vlvLbl.textContent = Math.round(startVol * 100) + '%';
+
+    var volDiff = targetVol - startVol;
+    if (volDiff <= 0.005) {
+      setTrackVolume(id, targetVol);
+      if (vlIn) vlIn.value = targetVol;
+      if (vlvLbl) vlvLbl.textContent = Math.round(targetVol * 100) + '%';
+      if (onDone) onDone();
+      return;
+    }
+
+    var steps = Math.max(25, Math.round(durationSec * 25));
+    var intervalMs = (durationSec * 1000) / steps;
+    var stepVol = volDiff / steps;
+    var count = 0;
+
+    s.fadeInterval = setInterval(function(){
+      count++;
+      var cur = getTrackVolume(id);
+      var newVol = Math.min(targetVol, cur + stepVol);
+      setTrackVolume(id, newVol);
+      if (vlIn) vlIn.value = newVol;
+      if (vlvLbl) vlvLbl.textContent = Math.round(newVol * 100) + '%';
+
+      if (count >= steps || newVol >= targetVol - 0.005) {
+        clearInterval(s.fadeInterval);
+        s.fadeInterval = null;
+        setTrackVolume(id, targetVol);
+        if (vlIn) vlIn.value = targetVol;
+        if (vlvLbl) vlvLbl.textContent = Math.round(targetVol * 100) + '%';
+        if (onDone) onDone();
+      }
+    }, intervalMs);
+  }
+
+  function fadeOutAudio(id, durationSec, onDone) {
+    var s = ST[id];
+    if (!s || !s.audio) return;
+    cancelFades(id);
+
+    var startVol = getTrackVolume(id);
+    var vlIn = document.getElementById('vl-' + id);
+    var vlvLbl = document.getElementById('vlv-' + id);
+
+    if (durationSec <= 0 || startVol <= 0) {
+      setTrackVolume(id, 0);
+      if (vlIn) vlIn.value = 0;
+      if (vlvLbl) vlvLbl.textContent = '0%';
+      if (onDone) onDone();
+      return;
+    }
+
+    var steps = Math.max(25, Math.round(durationSec * 25));
+    var intervalMs = (durationSec * 1000) / steps;
+    var stepVol = startVol / steps;
+    var count = 0;
+
+    s.fadeInterval = setInterval(function(){
+      count++;
+      var cur = getTrackVolume(id);
+      var newVol = Math.max(0, cur - stepVol);
+      setTrackVolume(id, newVol);
+
+      // Real-time visual tracking on the volume fader
+      if (vlIn) vlIn.value = newVol;
+      if (vlvLbl) vlvLbl.textContent = Math.round(newVol * 100) + '%';
+
+      if (count >= steps || newVol <= 0.005) {
+        clearInterval(s.fadeInterval);
+        s.fadeInterval = null;
+        setTrackVolume(id, 0);
+        if (vlIn) vlIn.value = 0;
+        if (vlvLbl) vlvLbl.textContent = '0%';
+        if (onDone) onDone();
+      }
+    }, intervalMs);
+  }
+
+  function manualFadeIn(id) {
+    var s = ST[id];
+    if (!s || !s.audio) return;
+    cancelFades(id);
+
+    var targetVol = s.savedVolume !== undefined ? s.savedVolume : 0.85;
+    var dur = (parseFloat(s.fadeIn) > 0) ? parseFloat(s.fadeIn) : 2.0;
+
+    var bFin = document.getElementById('bfin-' + id);
+    if (bFin) bFin.classList.add('fading');
+
+    var ts = document.getElementById('ts-' + id);
+    var te = document.getElementById('te-' + id);
+    var hd = document.getElementById('hd-' + id);
+    var lc = document.getElementById('lc-' + id);
+    var btn = document.getElementById('b-' + id);
+    var box = document.getElementById('bx-' + id);
+
+    if (!s.playing) {
+      var st = (ts ? parseFloat(ts.value) : 0) || 0;
+      s.audio.currentTime = st;
+      setTrackVolume(id, 0);
+
+      s.audio.play().then(function(){
+        fadeInAudio(id, targetVol, dur, function(){
+          if (bFin) bFin.classList.remove('fading');
+        }, false);
+      }).catch(function(err){
+        console.warn('Play prevented for ' + id + ':', err);
+        if (bFin) bFin.classList.remove('fading');
+      });
+
+      s.playing = true;
+      if (btn) {
+        btn.textContent = 'STOP';
+        btn.classList.add('on');
+      }
+      if (box) box.classList.add('on');
+      updateCuePill(id, s.loop ? 'looping' : 'active');
+
+      if (s.iv) clearInterval(s.iv);
+      s.iv = setInterval(function(){
+        var cur = s.audio.currentTime;
+        var et = te ? parseFloat(te.value) : (s.audio.duration || 9999);
+        var st2 = ts ? parseFloat(ts.value) : 0;
+        var mx = (ts ? parseFloat(ts.max) : s.audio.duration) || 1;
+        if (hd) hd.style.left = (cur / mx * 100) + '%';
+        if (lc) lc.textContent = cur.toFixed(1) + 's';
+
+        if (cur >= et - 0.05 || s.audio.ended) {
+          if (s.loop && id !== 'SFX-37') {
+            s.audio.currentTime = st2;
+            s.audio.play().catch(function(){});
+          } else {
+            stopSound(id);
+          }
+        }
+      }, 30);
+    } else {
+      // Already playing: if full volume, restart cue with fade-in; else ramp up from current volume
+      if (getTrackVolume(id) >= targetVol - 0.05) {
+        var stReset = (ts ? parseFloat(ts.value) : 0) || 0;
+        s.audio.currentTime = stReset;
+        setTrackVolume(id, 0);
+        fadeInAudio(id, targetVol, dur, function(){
+          if (bFin) bFin.classList.remove('fading');
+        }, false);
+      } else {
+        fadeInAudio(id, targetVol, dur, function(){
+          if (bFin) bFin.classList.remove('fading');
+        }, true);
+      }
+    }
+  }
+
+  function manualFadeOut(id) {
+    var s = ST[id];
+    if (!s || !s.audio) return;
+    if (!s.playing) {
+      var bFoutBrief = document.getElementById('bfout-' + id);
+      if (bFoutBrief) {
+        bFoutBrief.classList.add('fading');
+        setTimeout(function(){ bFoutBrief.classList.remove('fading'); }, 300);
+      }
+      return;
+    }
+
+    cancelFades(id);
+    var dur = (parseFloat(s.fadeOut) > 0) ? parseFloat(s.fadeOut) : 2.0;
+    var bFout = document.getElementById('bfout-' + id);
+    if (bFout) bFout.classList.add('fading');
+
+    var origVol = s.savedVolume !== undefined ? s.savedVolume : 0.85;
+    fadeOutAudio(id, dur, function(){
+      if (bFout) bFout.classList.remove('fading');
+      immediateStop(id);
+      setTrackVolume(id, origVol);
+      var vlIn = document.getElementById('vl-' + id);
+      var vlvLbl = document.getElementById('vlv-' + id);
+      if (vlIn) vlIn.value = origVol;
+      if (vlvLbl) vlvLbl.textContent = Math.round(origVol * 100) + '%';
+    });
+  }
+
+  function triggerSlowCrossfade(id) {
+    var s = ST[id];
+    if (!s || !s.audio) return;
+
+    var bSlow = document.getElementById('btn-slowfade-' + id);
+    var durInput = document.getElementById('slowfade-dur-' + id);
+    var meterWrap = document.getElementById('slowfade-meter-' + id);
+    var meterBar = document.getElementById('slowfade-bar-' + id);
+    var meterReadout = document.getElementById('slowfade-readout-' + id);
+    var meterSub = document.getElementById('slowfade-sub-' + id);
+    var box = document.getElementById('bx-' + id);
+    var vlIn = document.getElementById('vl-' + id);
+    var vlvLbl = document.getElementById('vlv-' + id);
+
+    var dur = durInput ? Math.max(1, parseFloat(durInput.value) || 30) : (s.slowFadeSec || 30);
+    s.slowFadeSec = dur;
+
+    if (s.isSlowCrossfading) {
+      // User tapped while crossfade in progress: cancel and restore original volume
+      cancelFades(id);
+      var origVol = s.savedVolume !== undefined ? s.savedVolume : 0.85;
+      setTrackVolume(id, origVol);
+      if (vlIn) vlIn.value = origVol;
+      if (vlvLbl) vlvLbl.textContent = Math.round(origVol * 100) + '%';
+      return;
+    }
+
+    if (!s.playing) {
+      if (bSlow) {
+        bSlow.classList.add('crossfading');
+        bSlow.textContent = '⚠️ NOT PLAYING';
+        setTimeout(function(){
+          if (bSlow) {
+            bSlow.classList.remove('crossfading');
+            bSlow.innerHTML = '⏳ SLOW CROSSFADE OUT (<span id="slowfade-lbl-' + id + '">' + dur + 's</span>)';
+          }
+        }, 1200);
+      }
+      return;
+    }
+
+    cancelFades(id);
+    var origVol = s.savedVolume !== undefined ? s.savedVolume : 0.85;
+    s.isSlowCrossfading = true;
+    if (bSlow) bSlow.classList.add('crossfading');
+    if (meterWrap) meterWrap.style.display = 'flex';
+    if (box) box.classList.add('slowfading');
+    if (meterBar) meterBar.style.width = '100%';
+
+    var startTime = Date.now();
+    var endTime = startTime + (dur * 1000);
+
+    if (s.slowCrossfadeInterval) clearInterval(s.slowCrossfadeInterval);
+    s.slowCrossfadeInterval = setInterval(function(){
+      var now = Date.now();
+      var remaining = Math.max(0, (endTime - now) / 1000);
+      var fractionLeft = Math.max(0, Math.min(1.0, remaining / dur));
+      var curVol = getTrackVolume(id);
+      var volPct = Math.round(curVol * 100);
+
+      if (bSlow) {
+        bSlow.innerHTML = '⏳ CROSSFADING: <b>' + remaining.toFixed(1) + 's</b> (' + volPct + '%) • CANCEL';
+      }
+      if (meterBar) {
+        meterBar.style.width = (fractionLeft * 100) + '%';
+      }
+      if (meterReadout) {
+        meterReadout.textContent = volPct + '% (' + remaining.toFixed(1) + 's left)';
+      }
+      if (meterSub) {
+        meterSub.textContent = 'Decaying over ' + dur + 's to silent live vocal entrance';
+      }
+
+      if (now >= endTime) {
+        clearInterval(s.slowCrossfadeInterval);
+        s.slowCrossfadeInterval = null;
+      }
+    }, 50);
+
+    fadeOutAudio(id, dur, function(){
+      s.isSlowCrossfading = false;
+      if (s.slowCrossfadeInterval) {
+        clearInterval(s.slowCrossfadeInterval);
+        s.slowCrossfadeInterval = null;
+      }
+      if (bSlow) {
+        bSlow.classList.remove('crossfading');
+        bSlow.innerHTML = '⏳ SLOW CROSSFADE OUT (<span id="slowfade-lbl-' + id + '">' + dur + 's</span>)';
+      }
+      if (meterBar) meterBar.style.width = '0%';
+      if (meterReadout) meterReadout.textContent = '0% (FADE COMPLETE)';
+      if (box) box.classList.remove('slowfading');
+      setTimeout(function(){
+        if (!s.isSlowCrossfading && meterWrap) {
+          meterWrap.style.display = 'none';
+          if (meterBar) meterBar.style.width = '100%';
+        }
+      }, 1800);
+
+      immediateStop(id);
+      setTrackVolume(id, origVol);
+      if (vlIn) vlIn.value = origVol;
+      if (vlvLbl) vlvLbl.textContent = Math.round(origVol * 100) + '%';
+    });
+  }
+
+  // --- Trimmer & Visuals ---
+  function setRange(id, dur) {
+    var ts = document.getElementById('ts-' + id);
+    var te = document.getElementById('te-' + id);
+    var le = document.getElementById('le-' + id);
+    if (!ts || !te || !le || isNaN(dur) || dur <= 0) return;
+    ts.max = dur;
+    te.max = dur;
+
+    if (ST[id] && ST[id].restoredTrim) {
+      var rStart = parseFloat(ST[id].trimStart) || 0;
+      var rEnd = (ST[id].trimEnd !== null && ST[id].trimEnd !== undefined) ? parseFloat(ST[id].trimEnd) : dur;
+      if (isNaN(rEnd) || rEnd <= rStart + 0.05 || (rEnd === 10 && dur > 12)) {
+        rStart = 0;
+        rEnd = dur;
+      }
+      ts.value = Math.min(dur, Math.max(0, rStart));
+      te.value = Math.min(dur, Math.max(parseFloat(ts.value) + 0.05, rEnd));
+      delete ST[id].restoredTrim;
+    } else {
+      ts.value = 0;
+      te.value = dur;
+    }
+
+    le.textContent = dur.toFixed(1) + 's';
+    drawFill(id);
+    updateCueLane(id);
+  }
+
+  function drawFill(id) {
+    var ts = document.getElementById('ts-' + id);
+    var te = document.getElementById('te-' + id);
+    var fi = document.getElementById('fi-' + id);
+    var ls = document.getElementById('ls-' + id);
+    var le = document.getElementById('le-' + id);
+    if (!ts || !te || !fi) return;
+    var mx = parseFloat(ts.max) || 1;
+    var sp = (parseFloat(ts.value) / mx) * 100;
+    var ep = (parseFloat(te.value) / mx) * 100;
+    fi.style.left = sp + '%';
+    fi.style.width = Math.max(0, ep - sp) + '%';
+    if (ls) ls.textContent = parseFloat(ts.value).toFixed(1) + 's';
+    if (le) le.textContent = parseFloat(te.value).toFixed(1) + 's';
+    if (ST[id]) {
+      ST[id].trimStart = parseFloat(ts.value);
+      ST[id].trimEnd = parseFloat(te.value);
+      scheduleAutoSave();
+    }
+  }
+
+  function onTrim(id, which) {
+    var ts = document.getElementById('ts-' + id);
+    var te = document.getElementById('te-' + id);
+    if (!ts || !te) return;
+    var s = parseFloat(ts.value);
+    var e = parseFloat(te.value);
+    if (s >= e) {
+      if (which === 's') ts.value = Math.max(0, e - 0.05);
+      else te.value = Math.min(parseFloat(te.max) || 100, s + 0.05);
+    }
+    drawFill(id);
+    updateCueLane(id);
+  }
+
+  function setSpd(id, v) {
+    if (!ST[id] || !ST[id].audio) return;
+    var a = ST[id].audio;
+    v = parseFloat(v);
+    a.playbackRate = v;
+    ['preservesPitch', 'mozPreservesPitch', 'webkitPreservesPitch'].forEach(function(p){
+      if (a[p] !== undefined) a[p] = false;
+    });
+    var sv = document.getElementById('sv-' + id);
+    if (sv) sv.textContent = v.toFixed(2) + 'x';
+    scheduleAutoSave();
+  }
+
+  // --- Sound Play / Stop with Faders ---
+  function immediateStop(id) {
+    var s = ST[id];
+    if (!s || !s.audio) return;
+    cancelFades(id);
+    s.audio.pause();
+    if (s.iv) clearInterval(s.iv);
+    s.playing = false;
+
+    var ts = document.getElementById('ts-' + id);
+    var st = (ts ? parseFloat(ts.value) : 0) || 0;
+    try {
+      s.audio.currentTime = st;
+    } catch(e) {}
+
+    var btn = document.getElementById('b-' + id);
+    var box = document.getElementById('bx-' + id);
+    if (btn) {
+      btn.textContent = 'PLAY';
+      btn.classList.remove('on');
+    }
+    if (box) box.classList.remove('on');
+    updateCuePill(id, 'standby');
+  }
+
+  function playSound(id) {
+    var s = ST[id];
+    if (!s || !s.audio) return;
+    cancelFades(id);
+    if (typeof SpatialEngine !== 'undefined') {
+      SpatialEngine.ensureContext();
+      SpatialEngine.updateTrackPosition(id);
+    }
+
+    var ts = document.getElementById('ts-' + id);
+    var te = document.getElementById('te-' + id);
+    var hd = document.getElementById('hd-' + id);
+    var lc = document.getElementById('lc-' + id);
+    var btn = document.getElementById('b-' + id);
+    var box = document.getElementById('bx-' + id);
+    var targetVol = (s.savedVolume !== undefined && !isNaN(s.savedVolume) && s.savedVolume > 0.01) ? s.savedVolume : 0.85;
+
+    var st = (ts ? parseFloat(ts.value) : 0) || 0;
+    try {
+      s.audio.currentTime = st;
+    } catch(e) {}
+
+    s.playStartTime = performance.now();
+    var fadeInSec = parseFloat(s.fadeIn) || 0;
+    var bFin = document.getElementById('bfin-' + id);
+    if (fadeInSec > 0 && bFin) bFin.classList.add('fading');
+
+    s.audio.muted = false;
+    if (fadeInSec > 0) {
+      setTrackVolume(id, 0);
+    } else {
+      setTrackVolume(id, targetVol);
+    }
+
+    var playPromise = s.audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(function(){
+        if (fadeInSec > 0) {
+          fadeInAudio(id, targetVol, fadeInSec, function(){
+            if (bFin) bFin.classList.remove('fading');
+          }, false);
+        }
+      }).catch(function(err){
+        console.warn('Play prevented for ' + id + ':', err);
+        if (bFin) bFin.classList.remove('fading');
+        s.playing = false;
+        if (btn) {
+          btn.textContent = 'PLAY';
+          btn.classList.remove('on');
+        }
+        if (box) box.classList.remove('on');
+        updateCuePill(id, 'standby');
+      });
+    }
+
+    s.playing = true;
+    if (btn) {
+      btn.textContent = 'STOP';
+      btn.classList.add('on');
+    }
+    if (box) box.classList.add('on');
+    updateCuePill(id, s.loop ? 'looping' : 'active');
+
+    if (s.iv) clearInterval(s.iv);
+    s.iv = setInterval(function(){
+      var elapsed = performance.now() - s.playStartTime;
+      var cur = s.audio.currentTime;
+      var et = te ? parseFloat(te.value) : (s.audio.duration || 9999);
+      if (isNaN(et) || et <= 0.1) et = (s.audio.duration && !isNaN(s.audio.duration)) ? s.audio.duration : 9999;
+      var st2 = ts ? parseFloat(ts.value) : 0;
+      var mx = (ts ? parseFloat(ts.max) : s.audio.duration) || 1;
+      if (hd) hd.style.left = (cur / mx * 100) + '%';
+      if (lc) lc.textContent = cur.toFixed(1) + 's';
+
+      // Guard: Ignore premature finish detection during initial 250ms of audio buffer decode
+      if (elapsed < 250) return;
+
+      var isFinished = (cur > st2 + 0.1) && (s.audio.ended || (et > st2 + 0.05 && cur >= et - 0.05));
+      if (isFinished) {
+        if (s.loop && id !== 'SFX-37') {
+          s.playStartTime = performance.now();
+          s.audio.currentTime = st2;
+          s.audio.play().catch(function(){});
+        } else {
+          immediateStop(id);
+          onSoundEnded(id);
+        }
+      }
+    }, 30);
+  }
+
+  function onSoundEnded(id) {
+    if (id === 'SFX-37') {
+      // Scene 6 Linkage: When SFX-37 (Agnes Letter VO) ends, SFX-23 (Quill Pen) must stop
+      if (ST['SFX-23'] && ST['SFX-23'].playing) {
+        var s23 = ST['SFX-23'];
+        var fo = parseFloat(s23.fadeOut) || 0;
+        if (fo > 0) {
+          stopSound('SFX-23');
+        } else {
+          fadeOutAudio('SFX-23', 0.8, function(){
+            immediateStop('SFX-23');
+            setTrackVolume('SFX-23', s23.savedVolume !== undefined ? s23.savedVolume : 0.85);
+          });
+        }
+      }
+      var scId6 = (ST['SFX-37'] && ST['SFX-37'].sceneId) ? ST['SFX-37'].sceneId : safeId('[Act III, Sc 6] Letters to Prague');
+      if (scId6 && SC_STATE[scId6] && SC_STATE[scId6].isPlaying) {
+        pauseScene(scId6);
+        SC_STATE[scId6].currentTime = SC_STATE[scId6].duration;
+        renderScenePlayhead(scId6);
+      }
+    }
+  }
+
+  function stopSound(id) {
+    var s = ST[id];
+    if (!s || !s.audio) return;
+
+    var fadeOutSec = parseFloat(s.fadeOut) || 0;
+    if (fadeOutSec > 0) {
+      var origVol = s.savedVolume !== undefined ? s.savedVolume : 0.85;
+      var bFout = document.getElementById('bfout-' + id);
+      if (bFout) bFout.classList.add('fading');
+      fadeOutAudio(id, fadeOutSec, function(){
+        if (bFout) bFout.classList.remove('fading');
+        immediateStop(id);
+        setTrackVolume(id, origVol);
+        onSoundEnded(id);
+      });
+    } else {
+      immediateStop(id);
+      onSoundEnded(id);
+    }
+  }
+
+  function togglePlay(id) {
+    var s = ST[id];
+    if (s && s.playing) {
+      stopSound(id);
+    } else {
+      playSound(id);
+    }
+  }
+
+  // --- Master Stop & Fade All ---
+  function stopAll() {
+    updateAllTabsPlayingState(false);
+    Object.keys(SC_STATE).forEach(function(scId){
+      pauseScene(scId);
+      resetScene(scId);
+    });
+    Object.keys(ST).forEach(function(id){
+      if (ST[id] && ST[id].playing) immediateStop(id);
+    });
+  }
+
+  function fadeOutAll() {
+    updateAllTabsPlayingState(false);
+    Object.keys(SC_STATE).forEach(function(scId){
+      pauseScene(scId);
+    });
+    var playingIds = Object.keys(ST).filter(function(id){ return ST[id].playing; });
+    if (playingIds.length === 0) return;
+
+    playingIds.forEach(function(id){
+      var s = ST[id];
+      var origVol = s.savedVolume !== undefined ? s.savedVolume : 0.85;
+      fadeOutAudio(id, 2.5, function(){
+        immediateStop(id);
+        setTrackVolume(id, origVol);
+      });
+    });
+  }
+
+  function switchOpt(id, optIdx, paths) {
+    var path = paths[optIdx];
+    var sel = document.getElementById('os-' + id);
+    if (!path) {
+      if (sel) sel.value = '0';
+      return;
+    }
+    var s = ST[id];
+    if (!s) return;
+    var vol = s.savedVolume !== undefined ? s.savedVolume : 0.85;
+    var rate = s.audio ? (s.audio.playbackRate || 1) : 1;
+    var loop = s.loop;
+
+    if (s.playing) immediateStop(id);
+
+    if (!s.audio) {
+      s.audio = new Audio(path);
+      s.audio.preload = 'auto';
+      s.audio.load();
+    } else {
+      s.audio.pause();
+      s.audio.src = path;
+      s.audio.preload = 'auto';
+      s.audio.load();
+    }
+    s.audio.playbackRate = rate;
+    s.loop = loop;
+    s.optIndex = optIdx;
+    setTrackVolume(id, vol);
+
+    function onMeta() {
+      if (s.audio && s.audio.duration && !isNaN(s.audio.duration)) {
+        setRange(id, s.audio.duration);
+      }
+    }
+    s.audio.addEventListener('loadedmetadata', onMeta, { once: true });
+    s.audio.addEventListener('canplay', onMeta, { once: true });
+    s.audio.addEventListener('durationchange', onMeta, { once: true });
+    if (s.audio.duration && !isNaN(s.audio.duration)) onMeta();
+
+    scheduleAutoSave();
+  }
+
+  // --- Cue & Timeline Visual Synchronization ---
+  function updateCuePill(id, state) {
+    var pill = document.getElementById('cuepill-' + id);
+    var block = document.getElementById('tlblock-' + id);
+    if (!pill) return;
+    pill.classList.remove('queued', 'active');
+
+    if (state === 'looping') {
+      pill.textContent = 'LOOPING';
+      pill.classList.add('active');
+      if (block) block.classList.add('active');
+    } else if (state === 'active') {
+      pill.textContent = 'PLAYING';
+      pill.classList.add('active');
+      if (block) block.classList.add('active');
+    } else if (state === 'queued') {
+      pill.textContent = 'QUEUED';
+      pill.classList.add('queued');
+      if (block) block.classList.remove('active');
+    } else {
+      pill.textContent = 'STANDBY';
+      if (block) block.classList.remove('active');
+    }
+  }
+
+  function updateCueLane(id) {
+    var s = ST[id];
+    if (!s) return;
+    var sc = SC_STATE[s.sceneId];
+    if (!sc) return;
+
+    var block = document.getElementById('tlblock-' + id);
+    if (!block) return;
+
+    var scDur = sc.duration;
+    var cueAt = s.cueTime;
+    var startPct = Math.min(100, Math.max(0, (cueAt / scDur) * 100));
+
+    var widthPct = 0;
+    if (s.loop) {
+      widthPct = Math.max(2, 100 - startPct);
+      block.classList.add('looping');
+      block.textContent = '🔁 ' + cueAt.toFixed(1) + 's - loop';
+    } else {
+      var ts = document.getElementById('ts-' + id);
+      var te = document.getElementById('te-' + id);
+      var clipDur = 5.0;
+      if (ts && te) clipDur = Math.max(0.5, parseFloat(te.value) - parseFloat(ts.value));
+      widthPct = Math.min(100 - startPct, Math.max(2, (clipDur / scDur) * 100));
+      block.classList.remove('looping');
+      block.textContent = cueAt.toFixed(1) + 's (' + clipDur.toFixed(1) + 's)';
+    }
+
+    block.style.left = startPct + '%';
+    block.style.width = widthPct + '%';
+
+    if (!s.cueEnabled) {
+      block.style.opacity = '0.2';
+    } else {
+      block.style.opacity = '1';
+    }
+  }
+
+  function getLastCueTime(scId) {
+    var sc = SC_STATE[scId];
+    if (!sc || !sc.soundIds || sc.soundIds.length === 0) return 0;
+    var maxCue = 0;
+    sc.soundIds.forEach(function(sid){
+      var s = ST[sid];
+      if (s && s.cueEnabled !== false) {
+        var ct = parseFloat(s.cueTime) || 0;
+        if (ct > maxCue) maxCue = ct;
+      }
+    });
+    return maxCue;
+  }
+
+  function updateSceneRuler(scId) {
+    var sc = SC_STATE[scId];
+    if (!sc) return;
+    var ticksWrap = document.getElementById('tlticks-' + scId);
+    if (!ticksWrap) return;
+
+    ticksWrap.innerHTML = '';
+    var dur = sc.duration;
+    var step = dur <= 30 ? 5 : (dur <= 120 ? 10 : 30);
+    for (var t = 0; t <= dur; t += step) {
+      var span = document.createElement('span');
+      span.className = 'tl-tick-label';
+      span.textContent = t + 's';
+      ticksWrap.appendChild(span);
+    }
+
+    var zone = document.getElementById('tlcont-zone-' + scId);
+    var seeker = document.getElementById('tlcont-seeker-' + scId);
+    var ptGroup = document.getElementById('sccont-pt-group-' + scId);
+    var ptInput = document.getElementById('sccont-pt-' + scId);
+
+    if (sc.continuous && sc.loop) {
+      var maxCue = getLastCueTime(scId);
+      var loopPt = (sc.contLoopPoint !== null && sc.contLoopPoint !== undefined)
+        ? sc.contLoopPoint
+        : ((scId.indexOf('7_2') !== -1) ? 18.0 : (maxCue > 0 && maxCue < dur ? maxCue : 0));
+      loopPt = Math.max(0, Math.min(dur, parseFloat(loopPt) || 0));
+      sc.contLoopPoint = loopPt;
+
+      var leftPct = (loopPt / dur) * 100;
+      var widthPct = Math.max(0, 100 - leftPct);
+
+      if (zone) {
+        zone.style.display = 'flex';
+        zone.style.left = leftPct + '%';
+        zone.style.width = widthPct + '%';
+        zone.textContent = '♾️ Continuous (' + loopPt.toFixed(1) + 's–' + dur.toFixed(0) + 's)';
+      }
+      if (seeker) {
+        seeker.style.display = 'flex';
+        seeker.style.left = leftPct + '%';
+      }
+      if (ptGroup) ptGroup.style.display = 'inline-flex';
+      if (ptInput && document.activeElement !== ptInput) ptInput.value = loopPt.toFixed(1);
+    } else {
+      if (zone) zone.style.display = 'none';
+      if (seeker) seeker.style.display = 'none';
+      if (ptGroup) ptGroup.style.display = 'none';
+    }
+
+    sc.soundIds.forEach(function(sid){
+      updateCueLane(sid);
+    });
+  }
+
+  // --- Scene Master Timeline Sequencer Engine ---
+  function playScene(scId) {
+    var sc = SC_STATE[scId];
+    if (!sc) return;
+
+    // Restart from beginning if playhead reached the end
+    if (sc.currentTime >= sc.duration - 0.05) {
+      sc.currentTime = 0;
+      sc.triggered = {};
+    } else if (sc.currentTime === 0) {
+      sc.triggered = {};
+    }
+
+    sc.isPlaying = true;
+    sc.lastTime = performance.now();
+
+    var btn = document.getElementById('scplay-' + scId);
+    if (btn) {
+      btn.textContent = 'PAUSE SCENE';
+      btn.classList.add('playing');
+      updateTabPlayingState(scId, true);
+    }
+
+    // Direct synchronous user-gesture cue trigger & media unlock
+    sc.soundIds.forEach(function(sid){
+      var s = ST[sid];
+      if (!s || !s.audio) return;
+      try {
+        if (s.cueEnabled && sc.currentTime >= s.cueTime && !sc.triggered[sid]) {
+          sc.triggered[sid] = true;
+          if (!s.playing) {
+            playSound(sid);
+          }
+        } else if (s.audio.readyState === 0) {
+          s.audio.load();
+        }
+      } catch(e) {}
+    });
+
+    function loop(now) {
+      if (!sc.isPlaying) return;
+      var dt = (now - sc.lastTime) / 1000;
+      sc.lastTime = now;
+      sc.currentTime += dt;
+
+      if (sc.currentTime >= sc.duration) {
+        if (scId.indexOf('Letters_to_Prague') !== -1) {
+          if (ST['SFX-23'] && ST['SFX-23'].playing) stopSound('SFX-23');
+          if (ST['SFX-37'] && ST['SFX-37'].playing) stopSound('SFX-37');
+          sc.currentTime = sc.duration;
+          pauseScene(scId);
+          renderScenePlayhead(scId);
+          return;
+        }
+        if (sc.loop) {
+          if (sc.continuous) {
+            // CONTINUOUS LOOP: Once cues have entered, loop continuously between loopBackPoint and end!
+            var maxCue = getLastCueTime(scId);
+            var loopBackPoint = (sc.contLoopPoint !== null && sc.contLoopPoint !== undefined)
+              ? Math.min(sc.duration - 0.5, Math.max(0, sc.contLoopPoint))
+              : ((scId.indexOf('7_2') !== -1) ? 18.0 : ((maxCue > 0 && maxCue < sc.duration) ? maxCue : 0));
+            sc.currentTime = loopBackPoint;
+
+            // In continuous loop:
+            // 1. Looping cues (e.g. Heartbeat SFX-33A_D2) remain alive / playing continuously.
+            // 2. One-shot cues (e.g. Child God, Shockwave) must NEVER re-trigger!
+            sc.soundIds.forEach(function(sid){
+              var s = ST[sid];
+              if (!s || !s.cueEnabled) return;
+              if (s.loop) {
+                sc.triggered[sid] = true;
+                if (!s.playing) {
+                  playSound(sid);
+                }
+              } else {
+                // One-shot track: keep marked as triggered so it NEVER re-triggers in continuous loop
+                sc.triggered[sid] = true;
+              }
+            });
+          } else {
+            // STANDARD LOOP: Layer from the beginning (0.0s)
+            sc.currentTime = 0;
+            sc.triggered = {};
+            sc.soundIds.forEach(function(sid){
+              if (ST[sid] && ST[sid].playing) immediateStop(sid);
+            });
+          }
+        } else {
+          sc.soundIds.forEach(function(sid){
+            if (ST[sid] && ST[sid].playing) stopSound(sid);
+          });
+          sc.currentTime = sc.duration;
+          pauseScene(scId);
+          renderScenePlayhead(scId);
+          return;
+        }
+      }
+
+      // Check cues to trigger
+      sc.soundIds.forEach(function(sid){
+        var s = ST[sid];
+        if (!s || !s.cueEnabled) return;
+        if (sc.currentTime >= s.cueTime && !sc.triggered[sid]) {
+          sc.triggered[sid] = true;
+          if (!s.playing) {
+            playSound(sid);
+          }
+        }
+      });
+
+      renderScenePlayhead(scId);
+      sc.animId = requestAnimationFrame(loop);
+    }
+
+    sc.animId = requestAnimationFrame(loop);
+  }
+
+  function pauseScene(scId) {
+    var sc = SC_STATE[scId];
+    if (!sc) return;
+    sc.isPlaying = false;
+    if (sc.animId) cancelAnimationFrame(sc.animId);
+    var btn = document.getElementById('scplay-' + scId);
+    if (btn) {
+      btn.textContent = 'PLAY SCENE';
+      btn.classList.remove('playing');
+      updateTabPlayingState(scId, false);
+    }
+  }
+
+  function resetScene(scId) {
+    var sc = SC_STATE[scId];
+    if (!sc) return;
+    pauseScene(scId);
+    sc.currentTime = 0;
+    sc.triggered = {};
+    sc.soundIds.forEach(function(sid){
+      if (ST[sid] && ST[sid].playing) immediateStop(sid);
+      updateCuePill(sid, 'queued');
+    });
+    renderScenePlayhead(scId);
+  }
+
+  function seekScene(scId, targetTime) {
+    var sc = SC_STATE[scId];
+    if (!sc) return;
+    targetTime = Math.max(0, Math.min(sc.duration, targetTime));
+    sc.currentTime = targetTime;
+
+    sc.soundIds.forEach(function(sid){
+      var s = ST[sid];
+      if (!s || !s.cueEnabled) return;
+      if (targetTime >= s.cueTime) {
+        sc.triggered[sid] = true;
+        if (!s.playing && s.loop && sc.isPlaying) {
+          playSound(sid);
+        }
+      } else {
+        sc.triggered[sid] = false;
+        if (s.playing) {
+          immediateStop(sid);
+        }
+        updateCuePill(sid, 'queued');
+      }
+    });
+
+    renderScenePlayhead(scId);
+  }
+
+  function renderScenePlayhead(scId) {
+    var sc = SC_STATE[scId];
+    if (!sc) return;
+    var pct = Math.min(100, Math.max(0, (sc.currentTime / sc.duration) * 100));
+
+    var mHead = document.getElementById('tlhead-' + scId);
+    if (mHead) mHead.style.left = pct + '%';
+
+    sc.soundIds.forEach(function(sid){
+      var lHead = document.getElementById('tllanehead-' + sid);
+      if (lHead) lHead.style.left = pct + '%';
+    });
+
+    var timeCur = document.getElementById('sccur-' + scId);
+    if (timeCur) timeCur.textContent = formatTime(sc.currentTime);
+  }
+
+  // --- Auto-Save Persistence ---
+  var saveTimer = null;
+  function scheduleAutoSave() {
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveStateToStorage, 300);
+  }
+
+  function serializeState() {
+    var out = { sounds: {}, scenes: {} };
+    Object.keys(ST).forEach(function(id){
+      var s = ST[id];
+      var dur = (s.audio && !isNaN(s.audio.duration)) ? s.audio.duration : null;
+      out.sounds[id] = {
+        cueTime: s.cueTime || 0,
+        cueEnabled: s.cueEnabled !== false,
+        trimStart: s.trimStart || 0,
+        trimEnd: (s.trimEnd !== null && s.trimEnd !== undefined) ? s.trimEnd : dur,
+        optIndex: s.optIndex || 0,
+        volume: s.savedVolume !== undefined ? s.savedVolume : 0.85,
+        pan: s.savedPan !== undefined ? s.savedPan : 0,
+        speed: s.audio ? s.audio.playbackRate : 1,
+        loop: s.loop,
+        fadeIn: s.fadeIn || 'off',
+        fadeOut: s.fadeOut || 'off',
+        slowFadeSec: s.slowFadeSec || (id === 'SFX-38_CHRISTMAS_MASS' ? 30 : 30),
+        subOctActive: !!s.subOctActive,
+        slowActive: !!s.slowActive
+      };
+    });
+    Object.keys(SC_STATE).forEach(function(scId){
+      var sc = SC_STATE[scId];
+      out.scenes[scId] = {
+        duration: sc.duration,
+        loop: sc.loop,
+        continuous: sc.continuous !== false,
+        contLoopPoint: (sc.contLoopPoint !== null && sc.contLoopPoint !== undefined) ? sc.contLoopPoint : null
+      };
+    });
+    return out;
+  }
+
+  function saveStateToStorage() {
+    try {
+      var data = serializeState();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch(e) {
+      console.warn('LocalStorage save failed:', e);
+    }
+  }
+
+  var DEFAULT_PRODUCTION_PRESET = {
+  "sounds": {
+    "SFX-PRE_CHIME": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 10.5,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "2.0",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-PRE_ANNOUNCEMENT": {
+      "cueTime": 8,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 52.35,
+      "optIndex": 2,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "2.0",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-01A": {
+      "cueTime": 0,
+      "cueEnabled": false,
+      "trimStart": 0,
+      "trimEnd": 21.66,
+      "optIndex": 2,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 0.7,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "2.0",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-01": {
+      "cueTime": 2,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 7.96,
+      "optIndex": 1,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "3.5",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-02": {
+      "cueTime": 4,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 64.37,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-02B": {
+      "cueTime": 10,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 6.5,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-02C": {
+      "cueTime": 11.5,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 4.38,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-03": {
+      "cueTime": 4,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 67.36,
+      "optIndex": 2,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-04A": {
+      "cueTime": 16,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 11.37,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-04B": {
+      "cueTime": 20,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 11.7,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": -0.55,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-04C": {
+      "cueTime": 24,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 12.16,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0.55,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-05": {
+      "cueTime": 8,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 11.16,
+      "optIndex": 1,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-06": {
+      "cueTime": 32,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 10.78,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-07": {
+      "cueTime": 35,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 12.32,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "3.5",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-06B": {
+      "cueTime": 38,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 8.5,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-08": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 41.04,
+      "optIndex": 1,
+      "volume": 0.12,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "3.0",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-09": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 60,
+      "optIndex": 2,
+      "volume": 0.17,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "3.0",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-33A": {
+      "cueTime": 0,
+      "cueEnabled": false,
+      "trimStart": 0,
+      "trimEnd": 10.01,
+      "optIndex": 1,
+      "volume": 0.96,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "3.5",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-10A": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 45,
+      "optIndex": 1,
+      "volume": 0.67,
+      "pan": 0,
+      "speed": 0.7,
+      "loop": true,
+      "fadeIn": "3.0",
+      "fadeOut": "5.0",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-35": {
+      "cueTime": 10,
+      "cueEnabled": false,
+      "trimStart": 0,
+      "trimEnd": 34.85,
+      "optIndex": 2,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "3.5",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-36": {
+      "cueTime": 2.5,
+      "cueEnabled": false,
+      "trimStart": 0,
+      "trimEnd": 13.98,
+      "optIndex": 2,
+      "volume": 0.78,
+      "pan": 0,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-15": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 20.4,
+      "optIndex": 1,
+      "volume": 0.12,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "5.0",
+      "fadeOut": "3.5",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-34": {
+      "cueTime": 4,
+      "cueEnabled": false,
+      "trimStart": 0,
+      "trimEnd": 12.32,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-16_WATER": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 60,
+      "optIndex": 2,
+      "volume": 0.85,
+      "pan": -0.35,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "5.0",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-17_CANTICLE": {
+      "cueTime": 12,
+      "cueEnabled": false,
+      "trimStart": 0,
+      "trimEnd": 290.07,
+      "optIndex": 0,
+      "volume": 0.49,
+      "pan": 0,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "5.0",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-23": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 68.81,
+      "optIndex": 2,
+      "volume": 0.17,
+      "pan": 0.4,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "3.0",
+      "fadeOut": "3.5",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-37": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 60.24,
+      "optIndex": 2,
+      "volume": 0.85,
+      "pan": -0.2,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-D2_WAR": {
+      "cueTime": 6,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 17.58,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": -0.2,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "3.0",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-D2_DRUMS": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 142.5,
+      "optIndex": 0,
+      "volume": 1,
+      "pan": 0.2,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-D2_VO": {
+      "cueTime": 23,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 29.44,
+      "optIndex": 2,
+      "volume": 1,
+      "pan": -0.25,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-D2_GATE": {
+      "cueTime": 13,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 5.12,
+      "optIndex": 0,
+      "volume": 0.39,
+      "pan": -0.4,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-D2_FB1": {
+      "cueTime": 6,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 6.63,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": -0.35,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-D2_FB2": {
+      "cueTime": 16.5,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 4.63,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-33A_D2": {
+      "cueTime": 6.6,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 10.01,
+      "optIndex": 1,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "3.5",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-CHILD_GOD": {
+      "cueTime": 4.6,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 4.8,
+      "optIndex": 1,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": true
+    },
+    "SFX-26": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 5.63,
+      "optIndex": 2,
+      "volume": 1,
+      "pan": 0,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-38_CHRISTMAS_MASS": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 900.4,
+      "optIndex": 1,
+      "volume": 0.49,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "3.0",
+      "fadeOut": "30.0",
+      "slowFadeSec": 30,
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-23_PAPAL": {
+      "cueTime": 15,
+      "cueEnabled": false,
+      "trimStart": 0,
+      "trimEnd": 68.81,
+      "optIndex": 1,
+      "volume": 0.33,
+      "pan": 0.35,
+      "speed": 1,
+      "loop": false,
+      "fadeIn": "1.5",
+      "fadeOut": "5.0",
+      "subOctActive": false,
+      "slowActive": false
+    },
+    "SFX-39": {
+      "cueTime": 0,
+      "cueEnabled": true,
+      "trimStart": 0,
+      "trimEnd": 257.79,
+      "optIndex": 0,
+      "volume": 0.85,
+      "pan": 0,
+      "speed": 1,
+      "loop": true,
+      "fadeIn": "off",
+      "fadeOut": "off",
+      "subOctActive": false,
+      "slowActive": false
+    }
+  },
+  "scenes": {
+    "_Pre_Show__House_Announcement": {
+      "duration": 60,
+      "loop": false,
+      "continuous": false,
+      "contLoopPoint": null
+    },
+    "_Act_0__Sc_1__Christ_on_the_Cross": {
+      "duration": 60,
+      "loop": true,
+      "continuous": true,
+      "contLoopPoint": 38
+    },
+    "_Act_I__Sc_2__The_Meeting_of_Francis": {
+      "duration": 60,
+      "loop": true,
+      "continuous": true,
+      "contLoopPoint": 0
+    },
+    "_Act_I__Sc_3__The_Escape": {
+      "duration": 60,
+      "loop": true,
+      "continuous": true,
+      "contLoopPoint": 0
+    },
+    "_Act_II__Sc_4__San_Damiano": {
+      "duration": 60,
+      "loop": true,
+      "continuous": true,
+      "contLoopPoint": 0
+    },
+    "_Act_II__Sc_5__Sisterhood___Passing": {
+      "duration": 60,
+      "loop": true,
+      "continuous": true,
+      "contLoopPoint": 0
+    },
+    "_Act_III__Sc_6__Letters_to_Prague": {
+      "duration": 61,
+      "loop": false,
+      "continuous": false,
+      "contLoopPoint": null
+    },
+    "_Act_III__Sc_7__The_Siege": {
+      "duration": 60,
+      "loop": true,
+      "continuous": true,
+      "contLoopPoint": 13
+    },
+    "_Act_III__Sc_7_2__Eucharistic_Miracle": {
+      "duration": 30,
+      "loop": true,
+      "continuous": true,
+      "contLoopPoint": 18
+    },
+    "_Act_IV__Sc_8__The_Christmas_Vision": {
+      "duration": 60,
+      "loop": true,
+      "continuous": true,
+      "contLoopPoint": 0
+    },
+    "_Act_IV__Sc_9__Final_Gaze___Blackout": {
+      "duration": 260,
+      "loop": true,
+      "continuous": true,
+      "contLoopPoint": 0
+    }
+  }
+};
+
+  function loadStateFromStorage() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY) ||
+                localStorage.getItem('to_gaze_soundboard_sequencer_v29') ||
+                localStorage.getItem('to_gaze_soundboard_sequencer_v28') ||
+                localStorage.getItem('to_gaze_soundboard_sequencer_v27') ||
+                localStorage.getItem('to_gaze_soundboard_sequencer_v26') ||
+                localStorage.getItem('to_gaze_soundboard_sequencer_v25') ||
+                localStorage.getItem('to_gaze_soundboard_sequencer_v24');
+      if (!raw) {
+        return JSON.parse(JSON.stringify(DEFAULT_PRODUCTION_PRESET));
+      }
+      var parsed = JSON.parse(raw);
+      if (parsed && parsed.scenes) {
+        var LEGACY_ID_MAP = {
+          'P1_PROLOGUE': '_Act_0__Sc_1__Christ_on_the_Cross',
+          'A1_MARKET': '_Act_I__Sc_2__The_Meeting_of_Francis',
+          'A2_THE_PASSION': '_Act_I__Sc_3__The_Escape',
+          'B1_SAN_DAMIANO': '_Act_II__Sc_4__San_Damiano',
+          'C2_SISTERHOOD': '_Act_II__Sc_5__Sisterhood___Passing',
+          'D1_LETTERS_TO_PRAGUE': '_Act_III__Sc_6__Letters_to_Prague',
+          'D2_SIEGE': '_Act_III__Sc_7__The_Siege',
+          'D6_CHRISTMAS_MASS': '_Act_IV__Sc_8__The_Christmas_Vision'
+        };
+        Object.keys(LEGACY_ID_MAP).forEach(function(oldId){
+          if (parsed.scenes[oldId] && !parsed.scenes[LEGACY_ID_MAP[oldId]]) {
+            parsed.scenes[LEGACY_ID_MAP[oldId]] = parsed.scenes[oldId];
+          }
+        });
+      }
+      if (!parsed.sounds) parsed.sounds = {};
+      // Non-destructive merge: NEVER overwrite user's saved settings or cue times!
+      Object.keys(DEFAULT_PRODUCTION_PRESET.sounds).forEach(function(sid){
+        if (!parsed.sounds[sid]) {
+          parsed.sounds[sid] = JSON.parse(JSON.stringify(DEFAULT_PRODUCTION_PRESET.sounds[sid]));
+        } else {
+          if (sid === 'SFX-38_CHRISTMAS_MASS') {
+            if (!parsed.sounds[sid].slowFadeSec) parsed.sounds[sid].slowFadeSec = 30;
+            if (parsed.sounds[sid].fadeOut === '5.0') parsed.sounds[sid].fadeOut = '30.0';
+          }
+          if (sid === 'SFX-PRE_ANNOUNCEMENT') {
+            parsed.sounds[sid].optIndex = 2; // User specifically chose Option 3
+            if (parsed.sounds[sid].cueTime === 0) {
+              parsed.sounds[sid].cueTime = 8.0;
+            }
+          }
+          if (sid === 'SFX-CHILD_GOD') {
+            parsed.sounds[sid].subOctActive = false; // Release heavy bass warp so it sounds like a true sacred child
+            parsed.sounds[sid].slowActive = true;    // Mysterious sacred slow pace
+            parsed.sounds[sid].optIndex = 1;        // Cathedral Reverb Halo
+            parsed.sounds[sid].speed = 1.0;
+            if (!parsed.sounds[sid].trimEnd || parsed.sounds[sid].trimEnd > 5.0 || parsed.sounds[sid].trimEnd === 7.8) {
+              parsed.sounds[sid].trimEnd = 4.8;
+            }
+          }
+        }
+      });
+      if (!parsed.scenes) parsed.scenes = {};
+      Object.keys(DEFAULT_PRODUCTION_PRESET.scenes).forEach(function(scId){
+        if (!parsed.scenes[scId]) {
+          parsed.scenes[scId] = JSON.parse(JSON.stringify(DEFAULT_PRODUCTION_PRESET.scenes[scId]));
+        }
+      });
+      return parsed;
+    } catch(e) {
+      return JSON.parse(JSON.stringify(DEFAULT_PRODUCTION_PRESET));
+    }
+  }
+
+  function exportPresetFile() {
+    saveStateToStorage();
+    var data = serializeState();
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'to_gaze_cues_' + (new Date().toISOString().slice(0,10)) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    var expBtn = document.getElementById('btn-export-preset');
+    if (expBtn) {
+      var origText = expBtn.innerHTML;
+      expBtn.innerHTML = '✅ Saved to Storage & File!';
+      expBtn.style.borderColor = '#2ecc71';
+      expBtn.style.color = '#2ecc71';
+      setTimeout(function(){
+        expBtn.innerHTML = origText;
+        expBtn.style.borderColor = '';
+        expBtn.style.color = '';
+      }, 2000);
+    }
+  }
+
+  function importPresetFile(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var data = JSON.parse(e.target.result);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        window.location.reload();
+      } catch(err) {
+        alert('Invalid preset JSON file');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function resetToDefaults() {
+    if (confirm('Reset all cue timings, trimmers, and settings back to factory defaults?')) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PRODUCTION_PRESET));
+      window.location.reload();
+    }
+  }
+
+  // --- Render Entire UI ---
+  function renderSoundboard() {
+    var app = document.getElementById('app');
+    if (!app) return;
+    app.innerHTML = '';
+
+    var saved = loadStateFromStorage();
+
+    // Render 9 Script-Aligned Tabs Bar
+    var tabBar = document.getElementById('scene-tab-bar');
+    if (tabBar) {
+      tabBar.innerHTML = '';
+      SCENES_DATA.forEach(function(scData){
+        var scId = safeId(scData.scene);
+        var btn = document.createElement('button');
+        btn.className = 'scene-tab-btn';
+        btn.setAttribute('data-tab-id', scId);
+        btn.innerHTML = '<span class="tab-dot"></span> ' + scData.scene;
+        btn.addEventListener('click', function(){
+          switchTab(scId);
+        });
+        tabBar.appendChild(btn);
+      });
+
+      var btnAll = document.createElement('button');
+      btnAll.className = 'scene-tab-btn scene-tab-btn-all';
+      btnAll.setAttribute('data-tab-id', 'ALL');
+      btnAll.innerHTML = '<span class="tab-dot"></span> 🌐 Show All Scenes';
+      btnAll.addEventListener('click', function(){
+        switchTab('ALL');
+      });
+      tabBar.appendChild(btnAll);
+    }
+
+    SCENES_DATA.forEach(function(scData){
+      var scName = scData.scene;
+      var scId = safeId(scName);
+
+      var savedSc = (saved && saved.scenes && saved.scenes[scId]) ? saved.scenes[scId] : null;
+
+      SC_STATE[scId] = {
+        name: scName,
+        duration: savedSc ? savedSc.duration : (
+          scId.indexOf('Christmas_Vision') !== -1 ? 900.0 :
+          scId.indexOf('Final_Gaze') !== -1 ? 260.0 :
+          scId.indexOf('Letters_to_Prague') !== -1 ? 61.0 :
+          scId.indexOf('7_2') !== -1 ? 30.0 : 60.0
+        ),
+        currentTime: 0.0,
+        isPlaying: false,
+        loop: savedSc ? savedSc.loop : ((scId.indexOf('Letters_to_Prague') !== -1) ? false : true),
+        continuous: (savedSc && savedSc.continuous !== undefined) ? savedSc.continuous : ((scId.indexOf('Letters_to_Prague') !== -1) ? false : true),
+        contLoopPoint: (savedSc && savedSc.contLoopPoint !== undefined) ? savedSc.contLoopPoint : ((scId.indexOf('7_2') !== -1) ? 18.0 : null),
+        lastTime: 0,
+        animId: null,
+        soundIds: [],
+        triggered: {}
+      };
+
+      var sec = document.createElement('div');
+      sec.className = 'sc';
+      sec.id = 'sc-sec-' + scId;
+
+      // 1. Scene Header & Master Deck
+      var scHeader = document.createElement('div');
+      scHeader.className = 'sc-header';
+      scHeader.innerHTML =
+        '<h2 class="sc-title">' + scName + '</h2>' +
+        '<div class="sc-deck">' +
+          '<button class="btn-sc-play" id="scplay-' + scId + '">PLAY SCENE</button>' +
+          '<button class="btn-sc-reset" id="screset-' + scId + '">RESET</button>' +
+          '<label class="llbl"><input type="checkbox" id="scloop-' + scId + '" ' + (SC_STATE[scId].loop ? 'checked' : '') + '> Loop Scene</label>' +
+          '<label class="llbl" title="Continuous Loop: When checked, once all tracks are launched, the loop sustains all tracks together continuously without cutting off or restarting from 0s"><input type="checkbox" id="sccont-' + scId + '" ' + (SC_STATE[scId].continuous ? 'checked' : '') + '> Continuous</label>' +
+          '<span class="sc-cont-pt-group" id="sccont-pt-group-' + scId + '" style="display:' + ((SC_STATE[scId].continuous && SC_STATE[scId].loop) ? 'inline-flex' : 'none') + ';align-items:center;gap:4px;font-size:0.75em;color:#f39c12;font-weight:700;">' +
+            '<span>LOOP AT:</span>' +
+            '<input type="number" class="sc-cont-pt-input" id="sccont-pt-' + scId + '" min="0" max="' + SC_STATE[scId].duration + '" step="0.5" value="' + (SC_STATE[scId].contLoopPoint || 0) + '" style="width:55px;background:#181818;color:#f39c12;border:1px solid #f39c12;border-radius:3px;padding:2px 4px;text-align:center;font-weight:bold;">s' +
+          '</span>' +
+          '<div class="sc-time"><span id="sccur-' + scId + '">00:00.0</span> / <span id="sctot-' + scId + '">' + formatTime(SC_STATE[scId].duration) + '</span></div>' +
+          '<div class="sc-dur-group">' +
+            '<span>LENGTH:</span>' +
+            '<input type="number" class="sc-dur-input" id="scdur-' + scId + '" min="10" max="1800" step="5" value="' + SC_STATE[scId].duration + '">s' +
+          '</div>' +
+        '</div>';
+      sec.appendChild(scHeader);
+
+      // 2. Timeline Track Bar & Lanes Container
+      var tlContainer = document.createElement('div');
+      tlContainer.className = 'tl-container';
+      tlContainer.innerHTML =
+        '<div class="tl-top-info">' +
+          '<span>Scene Timeline &amp; Cues</span>' +
+          '<span>Click or drag ruler to scrub • Drag ♾️ seeker to set continuous loop point</span>' +
+        '</div>' +
+        '<div class="tl-ruler-wrap" id="tlruler-' + scId + '">' +
+          '<div class="tl-cont-loop-zone" id="tlcont-zone-' + scId + '"></div>' +
+          '<div class="tl-cont-seeker" id="tlcont-seeker-' + scId + '" title="Drag continuous loop start point">' +
+            '<div class="tl-cont-handle">♾️</div>' +
+            '<div class="tl-cont-line"></div>' +
+          '</div>' +
+          '<div class="tl-ticks" id="tlticks-' + scId + '"></div>' +
+          '<div class="tl-master-playhead" id="tlhead-' + scId + '"></div>' +
+        '</div>' +
+        '<div class="tl-lanes" id="tllanes-' + scId + '"></div>';
+      sec.appendChild(tlContainer);
+
+      // 3. Grid for SFX Boxes
+      var grid = document.createElement('div');
+      grid.className = 'grid';
+      sec.appendChild(grid);
+
+      app.appendChild(sec); // Connected to DOM!
+
+      var lanesWrap = sec.querySelector('#tllanes-' + scId);
+
+      if (scData.sounds.length === 0) {
+        var blankNotice = document.createElement('div');
+        blankNotice.className = 'blank-scene-notice';
+        blankNotice.style.cssText = 'grid-column: 1 / -1; padding: 32px 20px; border: 1px dashed #3a3a3a; border-radius: 8px; text-align: center; color: #777; font-size: 0.88em; letter-spacing: 0.4px; background: rgba(0,0,0,0.25);';
+        blankNotice.innerHTML = '— <em>' + scName + '</em>: All SFX cleared (Blank Space / Directorial Stillness) —';
+        grid.appendChild(blankNotice);
+
+        var emptyLane = document.createElement('div');
+        emptyLane.className = 'tl-lane';
+        emptyLane.style.cssText = 'color:#555;font-size:0.75em;padding:8px 12px;font-style:italic;';
+        emptyLane.textContent = 'No sound cues scheduled for this scene';
+        lanesWrap.appendChild(emptyLane);
+      }
+
+      // Populate Sounds
+      scData.sounds.forEach(function(snd){
+        try {
+          var sid = snd.id;
+          SC_STATE[scId].soundIds.push(sid);
+
+          var savedSnd = (saved && saved.sounds && saved.sounds[sid]) ? saved.sounds[sid] : null;
+          var isSubOct = !!(snd.subOct1 && savedSnd && savedSnd.subOctActive);
+          var isSlow = !!(snd.slow1 && savedSnd && savedSnd.slowActive);
+
+          var naturalPaths = [snd.o1, snd.o2, snd.o3];
+          var naturalLabels = snd.optLabels || ['Option 1', 'Option 2', 'Option 3'];
+          var subOctPaths = snd.subOct1 ? [snd.subOct1, snd.subOct2, snd.subOct3] : null;
+          var subOctLabels = snd.subOctLabels || null;
+          var slowPaths = snd.slow1 ? [snd.slow1, snd.slow2, snd.slow3] : null;
+          var slowLabels = snd.slowLabels || null;
+          var subOctSlowPaths = snd.subOctSlow1 ? [snd.subOctSlow1, snd.subOctSlow2, snd.subOctSlow3] : null;
+          var subOctSlowLabels = snd.subOctSlowLabels || null;
+
+          function resolveBank(sub, slow) {
+            if (sub && slow && subOctSlowPaths) {
+              return { paths: subOctSlowPaths, labels: subOctSlowLabels };
+            } else if (sub && !slow && subOctPaths) {
+              return { paths: subOctPaths, labels: subOctLabels };
+            } else if (!sub && slow && slowPaths) {
+              return { paths: slowPaths, labels: slowLabels };
+            }
+            return { paths: naturalPaths, labels: naturalLabels };
+          }
+
+          var activeBank = resolveBank(isSubOct, isSlow);
+          var activePaths = activeBank.paths;
+          var currentLabels = activeBank.labels;
+
+          var initOpt = (savedSnd && savedSnd.optIndex !== undefined) ? savedSnd.optIndex : (snd.defOpt !== undefined ? snd.defOpt : 0);
+          var initFile = activePaths[initOpt] || activePaths[0];
+
+          var audioObj = new Audio(initFile);
+          audioObj.preload = 'auto';
+          audioObj.load();
+
+          var spatCoords = CUE_SPATIAL_REGISTRY[sid] || { az: 0, el: 0, dist: 2.0, occl: 1.0 };
+          SpatialEngine.attachTrack(sid, audioObj, spatCoords);
+          audioObj.addEventListener('ended', function(){
+            if (ST[sid] && ST[sid].playing) {
+              if (!ST[sid].loop || sid === 'SFX-37') {
+                immediateStop(sid);
+                onSoundEnded(sid);
+              }
+            }
+          });
+
+          ST[sid] = {
+            audio: audioObj,
+            iv: null,
+            playing: false,
+            loop: (savedSnd && savedSnd.loop !== undefined) ? savedSnd.loop : (snd.defLoop !== undefined ? snd.defLoop : (sid === 'SFX-37' ? false : true)),
+            sceneId: scId,
+            optIndex: initOpt,
+            savedVolume: (savedSnd && savedSnd.volume !== undefined) ? savedSnd.volume : 0.85,
+            savedPan: (savedSnd && savedSnd.pan !== undefined) ? savedSnd.pan : (snd.defPan !== undefined ? snd.defPan : 0),
+            cueTime: savedSnd ? savedSnd.cueTime : (snd.defCue || 0.0),
+            cueEnabled: savedSnd ? savedSnd.cueEnabled : true,
+            fadeIn: savedSnd ? savedSnd.fadeIn : 'off',
+            fadeOut: savedSnd ? savedSnd.fadeOut : 'off',
+            slowFadeSec: (savedSnd && savedSnd.slowFadeSec !== undefined) ? savedSnd.slowFadeSec : 30,
+            trimStart: savedSnd ? savedSnd.trimStart : 0,
+            trimEnd: savedSnd ? savedSnd.trimEnd : null,
+            restoredTrim: !!savedSnd,
+            subOctActive: isSubOct,
+            slowActive: isSlow,
+            naturalPaths: naturalPaths,
+            naturalLabels: naturalLabels,
+            subOctPaths: subOctPaths,
+            subOctLabels: subOctLabels,
+            slowPaths: slowPaths,
+            slowLabels: slowLabels,
+            subOctSlowPaths: subOctSlowPaths,
+            subOctSlowLabels: subOctSlowLabels,
+            resolveBank: resolveBank
+          };
+
+          setTrackVolume(sid, ST[sid].savedVolume);
+          if (savedSnd && savedSnd.speed) {
+            ST[sid].audio.playbackRate = savedSnd.speed;
+          }
+
+          // A. Build lane in the timeline
+          var lane = document.createElement('div');
+          lane.className = 'tl-lane';
+          lane.innerHTML =
+            '<div class="tl-lane-name" title="' + snd.label + '">' + snd.label + '</div>' +
+            '<div class="tl-lane-track" id="tllane-track-' + sid + '">' +
+              '<div class="tl-cue-block" id="tlblock-' + sid + '"></div>' +
+              '<div class="tl-lane-playhead" id="tllanehead-' + sid + '"></div>' +
+            '</div>';
+          lanesWrap.appendChild(lane);
+
+          // B. Build sound box
+          var d2 = snd.o2 ? '' : 'disabled';
+          var d3 = snd.o3 ? '' : 'disabled';
+          var o1Lbl = currentLabels[0] || 'Option 1';
+          var o2Lbl = currentLabels[1] || 'Option 2';
+          var o3Lbl = currentLabels[2] || 'Option 3';
+
+          var subOctHtml = snd.subOct1 ?
+            '<label class="llbl fxsub-lbl' + (isSubOct ? ' active' : '') + '" id="lbl-fxsub-' + sid + '" title="Sub-Octave Bass Overlay: Keeps natural vocal at 100% while modulating sub-bass foundation from 10% up to 50% intensity">' +
+              '<input type="checkbox" id="fxsub-' + sid + '" ' + (isSubOct ? 'checked' : '') + '> 🎸 Sub-Bass Overlay (10%➜50%)' +
+            '</label>' : '';
+
+          var slowHtml = snd.slow1 ?
+            '<label class="llbl fxslow-lbl' + (isSlow ? ' active' : '') + '" id="lbl-fxslow-' + sid + '" title="Slow-Down Time Deceleration: Starts 1st 20% at 1.0x normal speed, then smoothly decelerates from 0.5x down to 0.2x speed without shifting pitch (7.8s - 8.1s duration)">' +
+              '<input type="checkbox" id="fxslow-' + sid + '" ' + (isSlow ? 'checked' : '') + '> ⏳ Slow-Down FX' +
+            '</label>' : '';
+
+          var box = document.createElement('div');
+          box.className = 'box';
+          box.id = 'bx-' + sid;
+
+          box.innerHTML =
+            '<div class="trow">' +
+              '<span class="ttl">' + snd.label + '</span>' +
+              '<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">' +
+                subOctHtml +
+                slowHtml +
+                '<select class="osel" id="os-' + sid + '">' +
+                  '<option value="0"' + (initOpt === 0 ? ' selected' : '') + '>' + o1Lbl + '</option>' +
+                  '<option value="1"' + (initOpt === 1 ? ' selected' : '') + ' ' + d2 + '>' + o2Lbl + '</option>' +
+                  '<option value="2"' + (initOpt === 2 ? ' selected' : '') + ' ' + d3 + '>' + o3Lbl + '</option>' +
+                '</select>' +
+                '<label class="llbl"><input type="checkbox" id="lp-' + sid + '" ' + (ST[sid].loop ? 'checked' : '') + '> Loop</label>' +
+              '</div>' +
+            '</div>' +
+            '<div class="cue-strip">' +
+              '<label class="llbl" style="color:#aaa;"><input type="checkbox" id="cueon-' + sid + '" ' + (ST[sid].cueEnabled ? 'checked' : '') + '> In Scene</label>' +
+              '<div style="display:flex;align-items:center;gap:4px;">' +
+                '<span style="color:#888;">Cue At:</span>' +
+                '<input type="number" class="cue-time-input" id="cuetime-' + sid + '" min="0" max="600" step="0.5" value="' + ST[sid].cueTime + '">s' +
+              '</div>' +
+              '<button class="btn-pin-cue" id="cuepin-' + sid + '" title="Pin cue to current playhead time">📍 Pin</button>' +
+              '<span class="cue-status-pill queued" id="cuepill-' + sid + '">QUEUED</span>' +
+            '</div>' +
+            '<div class="fader-row">' +
+              '<div class="fader-item">' +
+                '<span class="fader-lbl">Fade In:</span>' +
+                '<select class="fader-select" id="fin-' + sid + '" title="Fade In duration">' +
+                  '<option value="off"' + (ST[sid].fadeIn === 'off' ? ' selected' : '') + '>None</option>' +
+                  '<option value="1.0"' + (ST[sid].fadeIn === '1.0' ? ' selected' : '') + '>1.0s</option>' +
+                  '<option value="1.5"' + (ST[sid].fadeIn === '1.5' ? ' selected' : '') + '>1.5s</option>' +
+                  '<option value="3.0"' + (ST[sid].fadeIn === '3.0' ? ' selected' : '') + '>3.0s</option>' +
+                  '<option value="5.0"' + (ST[sid].fadeIn === '5.0' ? ' selected' : '') + '>5.0s</option>' +
+                  '<option value="10.0"' + (ST[sid].fadeIn === '10.0' ? ' selected' : '') + '>10.0s</option>' +
+                  '<option value="15.0"' + (ST[sid].fadeIn === '15.0' ? ' selected' : '') + '>15.0s</option>' +
+                  '<option value="20.0"' + (ST[sid].fadeIn === '20.0' ? ' selected' : '') + '>20.0s</option>' +
+                  '<option value="30.0"' + (ST[sid].fadeIn === '30.0' ? ' selected' : '') + '>30.0s</option>' +
+                '</select>' +
+                '<button class="btn-box-fade btn-box-fade-in" id="bfin-' + sid + '" title="Trigger Fade In">▲ FADE IN</button>' +
+              '</div>' +
+              '<div class="fader-item">' +
+                '<span class="fader-lbl">Fade Out:</span>' +
+                '<select class="fader-select" id="fout-' + sid + '" title="Fade Out duration">' +
+                  '<option value="off"' + (ST[sid].fadeOut === 'off' ? ' selected' : '') + '>None</option>' +
+                  '<option value="1.5"' + (ST[sid].fadeOut === '1.5' ? ' selected' : '') + '>1.5s</option>' +
+                  '<option value="2.0"' + (ST[sid].fadeOut === '2.0' ? ' selected' : '') + '>2.0s</option>' +
+                  '<option value="3.5"' + (ST[sid].fadeOut === '3.5' ? ' selected' : '') + '>3.5s</option>' +
+                  '<option value="5.0"' + (ST[sid].fadeOut === '5.0' ? ' selected' : '') + '>5.0s</option>' +
+                  '<option value="10.0"' + (ST[sid].fadeOut === '10.0' ? ' selected' : '') + '>10.0s</option>' +
+                  '<option value="15.0"' + (ST[sid].fadeOut === '15.0' ? ' selected' : '') + '>15.0s</option>' +
+                  '<option value="20.0"' + (ST[sid].fadeOut === '20.0' ? ' selected' : '') + '>20.0s</option>' +
+                  '<option value="30.0"' + (ST[sid].fadeOut === '30.0' ? ' selected' : '') + '>30.0s</option>' +
+                  '<option value="45.0"' + (ST[sid].fadeOut === '45.0' ? ' selected' : '') + '>45.0s</option>' +
+                  '<option value="60.0"' + (ST[sid].fadeOut === '60.0' ? ' selected' : '') + '>60.0s</option>' +
+                '</select>' +
+                '<button class="btn-box-fade btn-box-fade-out" id="bfout-' + sid + '" title="Trigger Fade Out">▼ FADE OUT</button>' +
+              '</div>' +
+            '</div>' +
+            (sid === 'SFX-38_CHRISTMAS_MASS' ?
+              '<div class="slow-crossfade-row" id="slowfade-wrap-' + sid + '">' +
+                '<button class="btn-slow-crossfade" id="btn-slowfade-' + sid + '" title="Trigger smooth slow crossfade to live vocals">⏳ SLOW CROSSFADE OUT (<span id="slowfade-lbl-' + sid + '">' + (ST[sid].slowFadeSec || 30) + 's</span>)</button>' +
+                '<div class="slow-fade-adj" title="Adjust crossfade duration in seconds">' +
+                  '<span class="slow-fade-lbl">DURATION:</span>' +
+                  '<input type="number" class="slow-fade-input" id="slowfade-dur-' + sid + '" min="1" max="300" step="1" value="' + (ST[sid].slowFadeSec || 30) + '">' +
+                  '<span class="slow-fade-unit">s</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="slowfade-meter-wrap" id="slowfade-meter-' + sid + '">' +
+                '<div class="slowfade-meter-header">' +
+                  '<span class="slowfade-meter-title"><span class="slowfade-meter-dot"></span> LIVE VISUAL FADE OFF:</span>' +
+                  '<span class="slowfade-meter-readout" id="slowfade-readout-' + sid + '">100% (' + (ST[sid].slowFadeSec || 30) + 's)</span>' +
+                '</div>' +
+                '<div class="slowfade-meter-track">' +
+                  '<div class="slowfade-meter-fill" id="slowfade-bar-' + sid + '" style="width: 100%;"></div>' +
+                '</div>' +
+                '<div class="slowfade-meter-sub" id="slowfade-sub-' + sid + '">Decaying smoothly to silent vocal entrance</div>' +
+              '</div>' : '') +
+            '<div class="crow">' +
+              '<button class="btn-play" id="b-' + sid + '">PLAY</button>' +
+              '<div class="scol">' +
+                '<div class="srow"><span class="slbl">VOL</span><input type="range" id="vl-' + sid + '" min="0" max="1" step="0.01" value="' + ST[sid].savedVolume + '"><span class="sv" id="vlv-' + sid + '">' + Math.round(ST[sid].savedVolume * 100) + '%</span></div>' +
+                '<div class="srow"><span class="slbl">SPD</span><input type="range" class="spd" id="sp-' + sid + '" min="0.1" max="3" step="0.05" value="' + (savedSnd ? savedSnd.speed : 1) + '"><span class="sv" id="sv-' + sid + '">' + (savedSnd ? parseFloat(savedSnd.speed).toFixed(2) : '1.00') + 'x</span></div>' +
+                '<div class="pan-row"><span class="slbl" style="color:#2ecc71;">PAN</span><input type="range" class="pan-slider" id="pn-' + sid + '" min="-1" max="1" step="0.05" value="' + ST[sid].savedPan + '"><span class="pan-val" id="pv-' + sid + '" title="Double-click to Center">' + (ST[sid].savedPan === 0 ? 'CTR' : (ST[sid].savedPan < 0 ? 'L ' + Math.round(Math.abs(ST[sid].savedPan)*100) + '%' : 'R ' + Math.round(ST[sid].savedPan*100) + '%')) + '</span></div>' +
+            '<div class="spat-tag" id="spat-tag-' + sid + '">📍 Center Front (0°) • 2.0m</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="tbox">' +
+              '<div class="tarea">' +
+                '<div class="ttrk"></div>' +
+                '<div class="tfil" id="fi-' + sid + '"></div>' +
+                '<div class="thead" id="hd-' + sid + '"></div>' +
+                '<input class="tsl" type="range" id="ts-' + sid + '" min="0" max="100" step="0.01" value="0">' +
+                '<input class="tsl" type="range" id="te-' + sid + '" min="0" max="100" step="0.01" value="100">' +
+              '</div>' +
+              '<div class="tlab">' +
+                '<span id="ls-' + sid + '">0.0s</span>' +
+                '<span class="tcur" id="lc-' + sid + '">0.0s</span>' +
+                '<span id="le-' + sid + '">...</span>' +
+              '</div>' +
+            '</div>';
+
+          grid.appendChild(box);
+
+          // Wire box controls
+          var bBtn = box.querySelector('#b-' + sid);
+          if (bBtn) bBtn.addEventListener('click', function(){ togglePlay(sid); });
+
+          var bFinBtn = box.querySelector('#bfin-' + sid);
+          if (bFinBtn) bFinBtn.addEventListener('click', function(){ manualFadeIn(sid); });
+
+          var bFoutBtn = box.querySelector('#bfout-' + sid);
+          if (bFoutBtn) bFoutBtn.addEventListener('click', function(){ manualFadeOut(sid); });
+
+          if (sid === 'SFX-38_CHRISTMAS_MASS') {
+            var bSlowBtn = box.querySelector('#btn-slowfade-' + sid);
+            if (bSlowBtn) {
+              bSlowBtn.addEventListener('click', function(){
+                triggerSlowCrossfade(sid);
+              });
+            }
+            var slowDurIn = box.querySelector('#slowfade-dur-' + sid);
+            if (slowDurIn) {
+              slowDurIn.addEventListener('input', function(){
+                var val = Math.max(1, parseFloat(this.value) || 30);
+                ST[sid].slowFadeSec = val;
+                var lbl = box.querySelector('#slowfade-lbl-' + sid);
+                if (lbl && !ST[sid].isSlowCrossfading) {
+                  lbl.textContent = val + 's';
+                }
+                var mReadout = box.querySelector('#slowfade-readout-' + sid);
+                if (mReadout && !ST[sid].isSlowCrossfading) {
+                  mReadout.textContent = '100% (' + val + 's)';
+                }
+                scheduleAutoSave();
+              });
+            }
+          }
+
+          var vIn = box.querySelector('#vl-' + sid);
+          if (vIn) vIn.addEventListener('input', function(){
+            var val = parseFloat(this.value);
+            ST[sid].savedVolume = val;
+            setTrackVolume(sid, val);
+            var vlv = box.querySelector('#vlv-' + sid);
+            if (vlv) vlv.textContent = Math.round(val * 100) + '%';
+            scheduleAutoSave();
+          });
+
+
+
+          var sIn = box.querySelector('#sp-' + sid);
+          if (sIn) sIn.addEventListener('input', function(){ setSpd(sid, this.value); });
+
+          var pnIn = box.querySelector('#pn-' + sid);
+          var pvLbl = box.querySelector('#pv-' + sid);
+          if (pnIn) {
+            pnIn.addEventListener('input', function(){
+              var pVal = parseFloat(this.value);
+              setTrackPan(sid, pVal);
+              scheduleAutoSave();
+            });
+          }
+          if (pvLbl) {
+            pvLbl.addEventListener('dblclick', function(){
+              if (pnIn) pnIn.value = 0;
+              setTrackPan(sid, 0);
+              scheduleAutoSave();
+            });
+          }
+
+          var lIn = box.querySelector('#lp-' + sid);
+          if (lIn) lIn.addEventListener('change', function(){
+            ST[sid].loop = this.checked;
+            updateCueLane(sid);
+            scheduleAutoSave();
+          });
+
+          var finSel = box.querySelector('#fin-' + sid);
+          if (finSel) finSel.addEventListener('change', function(){
+            ST[sid].fadeIn = this.value;
+            scheduleAutoSave();
+          });
+
+          var foutSel = box.querySelector('#fout-' + sid);
+          if (foutSel) foutSel.addEventListener('change', function(){
+            ST[sid].fadeOut = this.value;
+            scheduleAutoSave();
+          });
+
+          var tsIn = box.querySelector('#ts-' + sid);
+          if (tsIn) tsIn.addEventListener('input', function(){ onTrim(sid, 's'); });
+
+          var teIn = box.querySelector('#te-' + sid);
+          if (teIn) teIn.addEventListener('input', function(){ onTrim(sid, 'e'); });
+
+          function refreshBank(soundId) {
+            var stObj = ST[soundId];
+            var bank = stObj.resolveBank(stObj.subOctActive, stObj.slowActive);
+            var osSel = box.querySelector('#os-' + soundId);
+            if (osSel) {
+              if (osSel.options[0]) osSel.options[0].textContent = bank.labels[0] || 'Option 1';
+              if (osSel.options[1]) osSel.options[1].textContent = bank.labels[1] || 'Option 2';
+              if (osSel.options[2]) osSel.options[2].textContent = bank.labels[2] || 'Option 3';
+            }
+            switchOpt(soundId, stObj.optIndex, bank.paths);
+            scheduleAutoSave();
+          }
+
+          if (snd.subOct1) {
+            var fxSubIn = box.querySelector('#fxsub-' + sid);
+            if (fxSubIn) {
+              fxSubIn.addEventListener('change', function(){
+                var active = this.checked;
+                ST[sid].subOctActive = active;
+                var lblEl = box.querySelector('#lbl-fxsub-' + sid);
+                if (lblEl) {
+                  if (active) lblEl.classList.add('active');
+                  else lblEl.classList.remove('active');
+                }
+                refreshBank(sid);
+              });
+            }
+          }
+
+          if (snd.slow1) {
+            var fxSlowIn = box.querySelector('#fxslow-' + sid);
+            if (fxSlowIn) {
+              fxSlowIn.addEventListener('change', function(){
+                var active = this.checked;
+                ST[sid].slowActive = active;
+                var lblEl = box.querySelector('#lbl-fxslow-' + sid);
+                if (lblEl) {
+                  if (active) lblEl.classList.add('active');
+                  else lblEl.classList.remove('active');
+                }
+                refreshBank(sid);
+              });
+            }
+          }
+
+          var osIn = box.querySelector('#os-' + sid);
+          if (osIn) osIn.addEventListener('change', function(){
+            var stObj = ST[sid];
+            var bank = stObj.resolveBank(stObj.subOctActive, stObj.slowActive);
+            switchOpt(sid, parseInt(this.value, 10), bank.paths);
+          });
+
+          // Cue controls wiring
+          var cueTimeInput = box.querySelector('#cuetime-' + sid);
+          if (cueTimeInput) cueTimeInput.addEventListener('input', function(){
+            var val = parseFloat(this.value) || 0;
+            ST[sid].cueTime = Math.max(0, val);
+            updateCueLane(sid);
+            scheduleAutoSave();
+          });
+
+          var cuePinBtn = box.querySelector('#cuepin-' + sid);
+          if (cuePinBtn) cuePinBtn.addEventListener('click', function(){
+            var curSceneTime = SC_STATE[scId].currentTime;
+            var rounded = parseFloat(curSceneTime.toFixed(1));
+            ST[sid].cueTime = rounded;
+            if (cueTimeInput) cueTimeInput.value = rounded;
+            updateCueLane(sid);
+            scheduleAutoSave();
+          });
+
+          // Interactive Timeline Cue Block Drag & Lane Track Click
+          var laneTrack = lane.querySelector('#tllane-track-' + sid);
+          var cueBlock = lane.querySelector('#tlblock-' + sid);
+          if (laneTrack && cueBlock) {
+            cueBlock.title = 'Drag horizontally to reposition cue start time';
+            function updateCueFromTrackEvent(e) {
+              var trackRect = laneTrack.getBoundingClientRect();
+              var clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+              var mouseX = clientX - trackRect.left;
+              var frac = Math.max(0, Math.min(1, mouseX / trackRect.width));
+              var newCue = Math.round(frac * SC_STATE[scId].duration * 10) / 10;
+              ST[sid].cueTime = newCue;
+              if (cueTimeInput) cueTimeInput.value = newCue;
+              updateCueLane(sid);
+            }
+            function startBlockDrag(e) {
+              e.stopPropagation();
+              e.preventDefault();
+              cueBlock.classList.add('dragging');
+              function onBlockMove(me) {
+                updateCueFromTrackEvent(me);
+              }
+              function onBlockUp() {
+                cueBlock.classList.remove('dragging');
+                window.removeEventListener('mousemove', onBlockMove);
+                window.removeEventListener('mouseup', onBlockUp);
+                window.removeEventListener('touchmove', onBlockMove);
+                window.removeEventListener('touchend', onBlockUp);
+                scheduleAutoSave();
+              }
+              window.addEventListener('mousemove', onBlockMove);
+              window.addEventListener('mouseup', onBlockUp);
+              window.addEventListener('touchmove', onBlockMove, { passive: false });
+              window.addEventListener('touchend', onBlockUp);
+            }
+            cueBlock.addEventListener('mousedown', startBlockDrag);
+            cueBlock.addEventListener('touchstart', startBlockDrag, { passive: false });
+            laneTrack.addEventListener('click', function(e){
+              if (e.target.closest('.tl-cue-block')) return;
+              updateCueFromTrackEvent(e);
+              scheduleAutoSave();
+            });
+          }
+
+          var cueOnBox = box.querySelector('#cueon-' + sid);
+          if (cueOnBox) cueOnBox.addEventListener('change', function(){
+            ST[sid].cueEnabled = this.checked;
+            updateCueLane(sid);
+            scheduleAutoSave();
+          });
+
+          // Metadata loader
+          var audioObj = ST[sid].audio;
+          function checkMeta() {
+            if (audioObj.duration && !isNaN(audioObj.duration)) {
+              setRange(sid, audioObj.duration);
+            }
+          }
+          audioObj.addEventListener('loadedmetadata', checkMeta);
+          audioObj.addEventListener('canplay', checkMeta);
+          audioObj.addEventListener('durationchange', checkMeta);
+          if (audioObj.duration && !isNaN(audioObj.duration)) checkMeta();
+
+        } catch (itemErr) {
+          console.error('Error initializing box for ' + snd.id + ':', itemErr);
+        }
+      });
+
+      // Wire Scene Master Controls
+      var scPlayBtn = document.getElementById('scplay-' + scId) || sec.querySelector('#scplay-' + scId);
+      if (scPlayBtn) scPlayBtn.addEventListener('click', function(){
+        if (SC_STATE[scId].isPlaying) pauseScene(scId);
+        else playScene(scId);
+      });
+
+      var scResetBtn = document.getElementById('screset-' + scId) || sec.querySelector('#screset-' + scId);
+      if (scResetBtn) scResetBtn.addEventListener('click', function(){
+        pauseScene(scId);
+        resetScene(scId);
+      });
+
+      var scLoopBox = document.getElementById('scloop-' + scId) || sec.querySelector('#scloop-' + scId);
+      if (scLoopBox) scLoopBox.addEventListener('change', function(){
+        SC_STATE[scId].loop = this.checked;
+        updateSceneRuler(scId);
+        scheduleAutoSave();
+      });
+
+      var scContBox = document.getElementById('sccont-' + scId) || sec.querySelector('#sccont-' + scId);
+      if (scContBox) scContBox.addEventListener('change', function(){
+        SC_STATE[scId].continuous = this.checked;
+        updateSceneRuler(scId);
+        scheduleAutoSave();
+      });
+
+      var scContPtInput = document.getElementById('sccont-pt-' + scId) || sec.querySelector('#sccont-pt-' + scId);
+      if (scContPtInput) {
+        scContPtInput.addEventListener('change', function(){
+          var val = parseFloat(this.value) || 0;
+          val = Math.max(0, Math.min(SC_STATE[scId].duration, val));
+          this.value = val.toFixed(1);
+          SC_STATE[scId].contLoopPoint = val;
+          updateSceneRuler(scId);
+          scheduleAutoSave();
+        });
+      }
+
+      var scDurInput = document.getElementById('scdur-' + scId) || sec.querySelector('#scdur-' + scId);
+      if (scDurInput) scDurInput.addEventListener('change', function(){
+        var val = parseFloat(this.value) || 60;
+        val = Math.max(10, Math.min(1800, val));
+        this.value = val;
+        SC_STATE[scId].duration = val;
+        var sctot = document.getElementById('sctot-' + scId) || sec.querySelector('#sctot-' + scId);
+        if (sctot) sctot.textContent = formatTime(val);
+        if (scContPtInput) scContPtInput.max = val;
+        updateSceneRuler(scId);
+        scheduleAutoSave();
+      });
+
+      // Timeline Ruler scrubbing & Seeker dragging
+      var tlRuler = document.getElementById('tlruler-' + scId) || sec.querySelector('#tlruler-' + scId);
+      var tlContSeeker = document.getElementById('tlcont-seeker-' + scId) || sec.querySelector('#tlcont-seeker-' + scId);
+
+      if (tlContSeeker && tlRuler) {
+        function startSeekerDrag(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          tlContSeeker.classList.add('dragging');
+          var rulerRect = tlRuler.getBoundingClientRect();
+          function onSeekerMove(me) {
+            var clientX = me.clientX !== undefined ? me.clientX : (me.touches && me.touches[0] ? me.touches[0].clientX : 0);
+            var mouseX = clientX - rulerRect.left;
+            var frac = Math.max(0, Math.min(1, mouseX / rulerRect.width));
+            var newPt = Math.round(frac * SC_STATE[scId].duration * 10) / 10;
+            SC_STATE[scId].contLoopPoint = newPt;
+            updateSceneRuler(scId);
+          }
+          function onSeekerUp() {
+            tlContSeeker.classList.remove('dragging');
+            window.removeEventListener('mousemove', onSeekerMove);
+            window.removeEventListener('mouseup', onSeekerUp);
+            window.removeEventListener('touchmove', onSeekerMove);
+            window.removeEventListener('touchend', onSeekerUp);
+            scheduleAutoSave();
+          }
+          window.addEventListener('mousemove', onSeekerMove);
+          window.addEventListener('mouseup', onSeekerUp);
+          window.addEventListener('touchmove', onSeekerMove, { passive: false });
+          window.addEventListener('touchend', onSeekerUp);
+        }
+        tlContSeeker.addEventListener('mousedown', startSeekerDrag);
+        tlContSeeker.addEventListener('touchstart', startSeekerDrag, { passive: false });
+      }
+
+      if (tlRuler) {
+        function scrubToEvent(e) {
+          var rulerRect = tlRuler.getBoundingClientRect();
+          var clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+          var clickX = clientX - rulerRect.left;
+          var frac = Math.max(0, Math.min(1, clickX / rulerRect.width));
+          var newTime = frac * SC_STATE[scId].duration;
+          seekScene(scId, newTime);
+        }
+        function startRulerScrub(e) {
+          if (e.target.closest('.tl-cont-seeker')) return;
+          scrubToEvent(e);
+          function onRulerMove(me) {
+            scrubToEvent(me);
+          }
+          function onRulerUp() {
+            window.removeEventListener('mousemove', onRulerMove);
+            window.removeEventListener('mouseup', onRulerUp);
+            window.removeEventListener('touchmove', onRulerMove);
+            window.removeEventListener('touchend', onRulerUp);
+          }
+          window.addEventListener('mousemove', onRulerMove);
+          window.addEventListener('mouseup', onRulerUp);
+          window.addEventListener('touchmove', onRulerMove, { passive: false });
+          window.addEventListener('touchend', onRulerUp);
+        }
+        tlRuler.addEventListener('mousedown', startRulerScrub);
+        tlRuler.addEventListener('touchstart', startRulerScrub, { passive: false });
+      }
+
+      updateSceneRuler(scId);
+    });
+
+    // Wire Top Bar Buttons
+    var stopAllBtn = document.getElementById('stopbtn');
+    if (stopAllBtn) stopAllBtn.addEventListener('click', stopAll);
+
+    var fadeAllBtn = document.getElementById('fadeallbtn');
+    if (fadeAllBtn) fadeAllBtn.addEventListener('click', fadeOutAll);
+
+    var expBtn = document.getElementById('btn-export-preset');
+    if (expBtn) expBtn.addEventListener('click', exportPresetFile);
+
+    var impBtn = document.getElementById('btn-import-preset');
+    var impFileInput = document.getElementById('preset-file-input');
+    if (impBtn && impFileInput) {
+      impBtn.addEventListener('click', function(){ impFileInput.click(); });
+      impFileInput.addEventListener('change', function(){
+        if (this.files && this.files[0]) importPresetFile(this.files[0]);
+      });
+    }
+
+    var rstBtn = document.getElementById('btn-reset-defaults');
+    if (rstBtn) rstBtn.addEventListener('click', resetToDefaults);
+
+    // Initialize Tab view (restore saved tab or show first scene)
+    var initialTab = localStorage.getItem('to_gaze_active_tab') || safeId(SCENES_DATA[0].scene);
+    switchTab(initialTab);
+
+    // --- Wire Immersive Spatial Audio Deck Controls ---
+    var btnSpatToggle = document.getElementById('btn-immersive-toggle');
+    var btnTogglePanel = document.getElementById('btn-toggle-spat-panel');
+    var spatPanel = document.getElementById('immersive-panel');
+
+    function toggleSpatPanel() {
+      if (!spatPanel) return;
+      var isOpen = (spatPanel.style.display !== 'none');
+      spatPanel.style.display = isOpen ? 'none' : 'grid';
+      if (btnTogglePanel) {
+        btnTogglePanel.innerHTML = isOpen ? '📐 Spatial Radar &amp; Siege States ▼' : '📐 Close Spatial Radar ▲';
+      }
+      if (!isOpen && typeof SpatialEngine !== 'undefined') {
+        SpatialEngine.ensureContext();
+        SpatialEngine.bindRadarCanvas(document.getElementById('church-radar-canvas'));
+      }
+    }
+
+    if (btnTogglePanel) btnTogglePanel.addEventListener('click', toggleSpatPanel);
+    if (btnSpatToggle) btnSpatToggle.addEventListener('click', toggleSpatPanel);
+
+    var selProfile = document.getElementById('select-speaker-profile');
+    var badgeProfile = document.getElementById('badge-current-profile');
+    var spkList = document.getElementById('spat-speaker-list');
+
+    function renderSpeakerList(profId) {
+      if (!spkList || !SPEAKER_PROFILES[profId]) return;
+      spkList.innerHTML = '';
+      SPEAKER_PROFILES[profId].speakers.forEach(function(spk){
+        var row = document.createElement('div');
+        row.className = 'spat-speaker-item';
+        row.id = 'spk-row-' + spk.id;
+        row.innerHTML = '<span>Ch ' + (spk.ch + 1) + ': ' + spk.name + '</span><span>' + (spk.isLFE ? 'LFE SUB' : (spk.isHeight ? 'DOME HEIGHT' : (spk.az + '°'))) + '</span>';
+        spkList.appendChild(row);
+      });
+      if (badgeProfile) {
+        badgeProfile.textContent = SPEAKER_PROFILES[profId].name.split('—')[0].trim().toUpperCase() + ' (' + SPEAKER_PROFILES[profId].channels + ' CH)';
+      }
+    }
+
+    if (selProfile) {
+      selProfile.addEventListener('change', function(){
+        SpatialEngine.setProfile(this.value);
+        renderSpeakerList(this.value);
+      });
+      renderSpeakerList('A');
+    }
+
+    var chkFallback = document.getElementById('chk-stereo-fallback');
+    if (chkFallback) {
+      chkFallback.addEventListener('change', function(){
+        SpatialEngine.setStereoFallback(this.checked);
+      });
+    }
+
+    var faderSurr = document.getElementById('fader-surround');
+    var valSurr = document.getElementById('val-surround');
+    if (faderSurr) {
+      faderSurr.addEventListener('input', function(){
+        SpatialEngine.setSurroundLevel(this.value);
+        if (valSurr) valSurr.textContent = Math.round(this.value * 100) + '%';
+      });
+    }
+
+    var faderLFE = document.getElementById('fader-lfe');
+    var valLFE = document.getElementById('val-lfe');
+    if (faderLFE) {
+      faderLFE.addEventListener('input', function(){
+        SpatialEngine.setLFELevel(this.value);
+        if (valLFE) valLFE.textContent = Math.round(this.value * 100) + '%';
+      });
+    }
+
+    var btnTestSpk = document.getElementById('btn-test-speakers');
+    var btnTestSpkModal = document.getElementById('btn-test-speakers-modal');
+    if (btnTestSpk) btnTestSpk.addEventListener('click', function(){ SpatialEngine.runSpeakerTestSequence(); });
+    if (btnTestSpkModal) btnTestSpkModal.addEventListener('click', function(){ SpatialEngine.runSpeakerTestSequence(); });
+
+    var btnBlackout = document.getElementById('btn-spat-blackout-fade');
+    if (btnBlackout) btnBlackout.addEventListener('click', fadeOutAll);
+
+    var btnHardStop = document.getElementById('btn-spat-hard-stop');
+    if (btnHardStop) btnHardStop.addEventListener('click', stopAll);
+
+    // Initial update of all source position labels
+    SpatialEngine.updateAllSourcePositions();
+    SpatialEngine.bindRadarCanvas(document.getElementById('church-radar-canvas'));
+
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderSoundboard);
+  } else {
+    renderSoundboard();
+  }
+})();
+</script>
+</body>
+</html>
